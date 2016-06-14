@@ -1,0 +1,122 @@
+<apex:page StandardController="Account" extensions="CommunicationPrefEditAllController" >
+ 
+   <apex:form >
+   
+      <apex:sectionHeader subtitle="Communication Preferences"/>
+     <apex:pageBlock >
+     
+  <br/><div class="pbSubheader brandTertiaryBgr first tertiaryPalette">
+   
+   <h3> Category</h3>
+   </div>   <br/> 
+   <table class="list"  border="0" cellpadding="0" cellspacing="0"><colgroup span="8"></colgroup> <thead class="" ><tr class="headerRow">
+    <apex:repeat value="{!lstHeaderCategory}" var="headerVar">
+    <!-- Table to show all communication Preferences in edit mode --> 
+      
+      <th class="headerRow" scope="col" span="1">
+      <div>
+      {!headerVar}</div></th><!-- Showing the header -->
+    
+    </apex:repeat></tr></thead>
+    <tbody>
+        <apex:repeat value="{!mapCSFieldCategory}" var="fieldListVar">  <!-- Showing the related fields for each communication category-->
+        <tr class="dataRow even  first">
+             <td>{!fieldListVar}</td>
+             <apex:repeat value="{!mapCSFieldCategory[fieldListVar]}" var="fieldVar" >
+             <td class="dataCell  ">  <apex:inputField value="{!oCommPref[fieldVar]}" /></td>
+          
+        </apex:repeat> 
+    </tr>
+    </apex:repeat>  
+     </tbody>  
+   </table> 
+   
+     <!-- button blocks --> 
+     <Apex:pageBlockButtons location="both">
+      <apex:commandButton value="Save All" action="{!save}"/>
+        <input type="button" value="Cancel" onClick="window.top.location='/{!accountId}'" class="btn"/>
+     </Apex:pageBlockButtons>
+        
+           
+     
+  <br/><div class="pbSubheader brandTertiaryBgr first tertiaryPalette">
+   
+   <h3> Subscription</h3>
+   </div>   <br/> 
+       
+   <table class="list"  border="0" cellpadding="0" cellspacing="0"><colgroup span="8"></colgroup> <thead class="" ><tr class="headerRow">
+    <apex:repeat value="{!lstHeaderSubscription}" var="headerVar">
+    <!-- Table to show all communication Preferences in edit mode --> 
+      
+      <th class="headerRow" scope="col" span="1">
+      <div>
+      {!headerVar}</div></th><!-- Showing the header -->
+    
+    </apex:repeat></tr></thead>
+    <tbody>
+        <apex:repeat value="{!mapCSFieldSubscription}" var="fieldListVar">  <!-- Showing the related fields for each communication category-->
+        <tr class="dataRow even  first">
+             <td>{!fieldListVar}</td>
+             <apex:repeat value="{!mapCSFieldSubscription[fieldListVar]}" var="fieldVar" >
+             <td class="dataCell  ">  <apex:inputField value="{!oCommPref[fieldVar]}" /></td>
+          
+        </apex:repeat> 
+    </tr>
+    </apex:repeat>  
+     </tbody>  
+   </table> 
+   
+     <!-- button blocks --> 
+   
+  <br/>  <div class="pbSubheader brandTertiaryBgr first tertiaryPalette">
+   
+   <h3> Other Preferences</h3>
+   </div>   <br/> 
+       <apex:outputPanel layout="block"  >
+     
+       <table class="list" border="0" cellpadding="0" cellspacing="0">
+        <colgroup span="8"></colgroup>
+         <apex:repeat value="{!lstCommPrefVal}" var="commFieldVar"  >
+         <thead>
+           <tr class="headerRow">
+            <th class="headerRow">
+              <div> Category</div>  
+            </th>
+          <apex:repeat value="{!lstBooleanField}" var="commFieldVar2" rendered="{!bShowBoolean}">
+         
+            <th class="headerRow">
+                <div>{!SUBSTITUTE(SUBSTITUTE(commFieldVar2,'__c',''),'_',' ')}</div>
+            </th> 
+        
+           </apex:repeat>
+           
+           
+           </tr></thead>
+           <tbody>
+           <tr class="dataRow" >
+            <td class="dataCell">
+              {!$label.BooleanFieldSection}
+             </td>
+           <apex:repeat value="{!lstBooleanField}" var="commFieldVar2">
+         
+            
+               <td class="dataCell">
+                <apex:inputField value="{!commFieldVar[commFieldVar2]}" />
+             </td>
+        
+           </apex:repeat>
+         </tr>
+          </tbody>
+        </apex:repeat>
+        
+     
+      </table> 
+     </apex:outputPanel>  
+  
+     
+       
+   </apex:pageBlock>    
+   
+   </apex:form>
+ 
+</apex:page>

@@ -1,0 +1,68 @@
+<apex:page controller="TaskSummaryDashboardController" sidebar="false" showHeader="false" showChat="false">
+    <!-- Below script block is used to import datatable plugin -->
+     <script src="{!$Resource.jQueryLibrary}"></script>
+     <script type="text/javascript" language="javascript" src="{!$Resource.DataTablesLibrary}"></script>
+        <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+        <link rel="stylesheet"  href="{!$Resource.jQueryThemeLibrary}"></link>
+     <!-- Script block is used to set jquey pagination plugin -->
+        <script>
+          $(document).ready(function(){
+             //alert("hii");
+                  $("[Id$='TaskTable']").dataTable({
+               //"bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "sPageLast":"last",
+                 "iDisplayLength": 10,
+                 "order": [[ 1, "desc" ]]
+                  
+                
+            });
+                 
+             $(".dataTables_length").eq(0).remove();
+           $(".dataTables_filter").eq(0).remove();
+             
+             });
+        
+        
+        </script>
+ 
+   <apex:form >
+  
+        <Apex:pageBlock title="Overdue Task Summary Report" >
+         <apex:pageMessages rendered="{!NOT(bShowTable)}"></apex:pageMessages> <!-- It shows when no overdue task/no Campaign found -->
+         
+         <!-- Below section gives ability to get all tasks in excel file -->
+            <apex:pageBlockButtons location="top" rendered="{!bShowTable}">
+                <input type="button" class="btn" value="Show Task report" onClick="window.top.location='{!JSENCODE(sURL)}'" target="_parent"/>
+            </apex:pageBlockButtons>
+            
+            <!-- Below table shows no of overdue tasks per Campaign -->
+            <apex:pageBlockTable value="{!lstTaskSummary}" var="taskVar" id="TaskTable" rendered="{!bShowTable}">
+              
+                  <apex:Column headerValue="Campaign Name">
+                     <a href='/{!taskVar.oCampaign.Id}' target="_top">{!taskVar.oCampaign.Name}</a>
+                 </apex:column>
+                 <apex:Column headerValue="# of Pending Task">
+                     <apex:outputText value="{!taskVar.iNoOfTask}"></apex:outputText>
+                 </apex:column>
+              
+                 
+              
+              
+              </apex:pageBlockTable>
+            
+   
+          <br/> <br/>
+        
+        </Apex:pageBlock>
+   
+       
+   
+   
+   </apex:form>
+
+
+
+</apex:page>

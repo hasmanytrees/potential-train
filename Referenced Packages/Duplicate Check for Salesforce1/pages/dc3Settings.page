@@ -1,0 +1,142 @@
+<apex:page docType="html-5.0" controller="dupcheck.dc3ControllerSettings" cache="false" Title="DC Settings - Duplicate Check for Salesforce" sidebar="false" action="{!janitor}" tabstyle="dc3Setup__tab">
+
+	<apex:stylesheet value="{!URLFOR($Resource.dupcheck__dc3Assets,'/dc3/assets/css/bootstrap-namespaced.min.css')}" />
+	<apex:stylesheet value="{!URLFOR($Resource.dupcheck__dc3Assets,'/dc3/assets/css/fonts.css')}" />
+	<apex:stylesheet value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/style/duplicatecheck.css" />
+
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" /> 
+	<apex:includeScript value="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" />
+
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js" />
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular-sanitize.min.js" />
+
+	<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap.js" />
+	<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/bootstrap-modal.js" />
+
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/bootbox.min.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/duplicatecheck.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/duplicatecheck.settings.js" />
+
+	<apex:includeScript value="../../soap/ajax/31.0/connection.js" />
+
+	<div class="bootstrap-sf1" ng-app="settingsApp" ng-controller="settingsController" data-sf-delete-temp-all="{!$RemoteAction.dc3ControllerSettings.deleteTempAll}" data-sf-update-setting="{!$RemoteAction.dc3ControllerSettings.updateSetting}" data-sf-config="{!$RemoteAction.dc3ControllerSettings.getConfig}">
+		<div class="container-fluid">
+			<!-- NAV TOP BAR -->
+			<div class="row mg-t-10">
+				<div class="col-xs-6">
+					<button class="btn btn-sm btn-info" ng-click="openUrl('{!URLFOR($Page.dc3Setup, null)}')">Back to setup</button>
+				</div>
+				<div class="col-xs-6">
+					<div class="pull-right tools">
+						<a href="#" onClick="dcNavigate('http://ity.vc/app-settings', '')" class="help">Help <i class="s1utility s1utility-help "></i></a>
+					</div>
+				</div>
+			</div>
+			<div class="panel" >
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-xs-12">DC Settings</div>
+					</div> 
+				</div>
+				<div class="panel-body">
+					<div class="row mg-b-10">
+						<div class="col-xs-6">Default DC Search tab</div>
+						<div class="col-xs-6">
+							<select ng-model="data.settings.DefaultSearchTab" ng-options="rt.value as rt.label for rt in data.searchTab" class="form-control" ng-change="updateSetting('DefaultSearchTab')"/>	
+						</div>
+					</div>
+					<div class="row mg-b-10" >
+						<div class="col-xs-6">Target “Open” button</div>
+						<div class="col-xs-6">
+							<select ng-change="updateSetting('OpenTarget')" class="form-control" data-width="100%" ng-model="data.settings.OpenTarget">
+								<option value="NEW">Open in a new window or new Console tab</option>
+								<option value="EXIST">Open in existing window or active Console tab</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mg-b-10">
+						<div class="col-xs-6">Delete Temp File</div>
+						<div class="col-xs-6">
+							<button class="btn btn-default" ng-if="!data.dc3SearchBatchDelete" ng-click="startDeleteTempAll()">Start Delete Job</button>
+							<button class="btn btn-default" ng-if="data.dc3SearchBatchDelete" disabled="disabled">
+								<span><i class="s1utility s1utility-spinner s1utility-animate"></i> Delete Job Active</span>
+							</button> 
+						</div>
+					</div>
+					<div class="row mg-b-10" ng-if="{!license.features.plugin}">
+						<div class="col-xs-6">Plugin Merge</div>
+						<div class="col-xs-6">
+							<select ng-model="data.settings.PluginMerge" ng-options="rt.value as rt.label for rt in data.classes" class="form-control" ng-change="updateSetting('PluginMerge')"/>	
+						</div>
+					</div>
+					<div class="row mg-b-10" ng-if="{!license.features.plugin}">
+						<div class="col-xs-6">Plugin Convert</div>
+						<div class="col-xs-6">
+							<select ng-model="data.settings.PluginConvert" ng-options="rt.value as rt.label for rt in data.classes" class="form-control" ng-change="updateSetting('PluginConvert')"/>
+						</div>
+					</div>
+					<div class="row mg-b-10" ng-if="{!license.features.plugin}">
+						<div class="col-xs-6">Plugin Prevention</div>
+						<div class="col-xs-6">
+							<select ng-model="data.settings.PluginPrevention" ng-options="rt.value as rt.label for rt in data.classes" class="form-control" ng-change="updateSetting('PluginPrevention')"/>
+						</div>
+					</div>
+					<div class="row mg-b-10" ng-if="{!license.features.plugin}">
+						<div class="col-xs-6">Plugin Search</div>
+						<div class="col-xs-6">
+							<select ng-model="data.settings.PluginSearch" ng-options="rt.value as rt.label for rt in data.classes" class="form-control" ng-change="updateSetting('PluginSearch')"/>
+						</div>
+					</div>
+					<div class="row mg-b-10" >
+						<div class="col-xs-6">Disable Triggers</div>
+						<div class="col-xs-6">
+							<select ng-change="updateSetting('DisableTrigger')" class="form-control" data-width="100%" ng-model="data.settings.DisableTrigger">
+								<option ng-selected="data.settings.DisableTrigger == true" value="true">Enabled</option>
+								<option ng-selected="data.settings.DisableTrigger == false" value="false">Disabled</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mg-b-10" ng-if="{!license.features.auditLogging}">
+						<div class="col-xs-6">Audit Logging</div>
+						<div class="col-xs-6">
+							<select ng-change="updateSetting('AuditLogging')" class="form-control" data-width="100%" ng-model="data.settings.AuditLogging">
+								<option ng-selected="data.settings.AuditLogging == true" value="true">Enabled</option>
+								<option ng-selected="data.settings.AuditLogging == false" value="false">Disabled</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mg-b-10">
+						<div class="col-xs-6">Trigger Duplicate Prevention when editing</div>
+						<div class="col-xs-6">
+							<select ng-change="updateSetting('PreventionOnAllFields')" class="form-control" data-width="100%" ng-model="data.settings.PreventionOnAllFields">
+								<option ng-selected="data.settings.PreventionOnAllFields == true" value="true">All Fields</option>
+								<option ng-selected="data.settings.PreventionOnAllFields == false" value="false">Only Fields configured in DC Scenarios</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mg-b-10">
+						<div class="col-xs-6">Number of duplicates displayed with Duplicate Prevention, you can view all by clicking show more.</div>
+						<div class="col-xs-6">
+							<input type="number" ng-change="updateSetting('MaxResultCount')" class="form-control" data-width="100%" ng-model="data.settings.MaxResultCount"/>
+						</div>
+					</div>
+					<div class="row mg-b-10">
+						<div class="col-xs-6">Merge: show read only fields while merging.</div>
+						<div class="col-xs-6">
+							<select ng-change="updateSetting('MergeShowReadOnly')" class="form-control" data-width="100%" ng-model="data.settings.MergeShowReadOnly">
+								<option ng-selected="data.settings.MergeShowReadOnly == true" value="true">Enabled</option>
+								<option ng-selected="data.settings.MergeShowReadOnly== false" value="false">Disabled</option>
+							</select>
+						</div>
+					</div>
+					
+				</div>
+				
+
+				<div class="panel-footer"></div>
+			</div>
+
+		</div>
+	</div>
+</apex:page>

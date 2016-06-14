@@ -1,0 +1,285 @@
+<apex:page controller="MetadataUtility.WorkflowControllerExtract" sidebar="false" showHeader="false" readOnly="true" >
+
+
+
+
+
+ <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+
+
+
+<!-- Latest compiled and minified JavaScript -->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+      
+      <apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__Vaporizer_Stylesheet)}"/>
+      
+
+
+<script type="text/javascript" language="javascript"
+    src="https://cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+<script class="jsbin"
+    src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script><apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__tableJquery,'tableJQUERY/demo_Page.css')}" />
+<apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__tableJquery,'tableJQUERY/table.css')}" />
+<link rel="stylesheet"
+    href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"></link>
+
+     <style>
+     
+     .newRow{
+     
+       bgcolor:#FF0000;
+     
+     
+     }
+
+    #maincont #menu_settings{
+    display:block;
+    }
+
+     
+     </style>
+
+        <script type="text/javascript">
+        function toggleSelectAll(checkbox){
+        
+            var $j = jQuery.noConflict();
+            
+            //all checkbox is selected
+            if(checkbox.checked){
+
+                //set all row level checkboxes selected
+                $j( ".wfCB" ).prop('checked', true);
+                
+            }
+            else{
+
+                //set all row level checkboxes de-selected
+                $j( ".wfCB" ).prop('checked', false);
+                
+            }
+            
+        }
+        
+        function toggleItem(checkbox){
+            
+            var $j = jQuery.noConflict();
+            
+            var cbs = $j('.wfCB');
+            
+            //all row level checkboxes selected
+            if(cbs.filter(':not(:checked)').length==0){
+                
+                //set "all checkbox" selected
+                $j("input[id$=selectAll]").prop('checked', true);
+                
+            }
+            else{
+                
+                //set "all checkboxes" de-selected
+                $j("input[id$=selectAll]").prop('checked', false);
+                
+            }
+                        
+        }
+        </script>
+</head>
+
+    <body> 
+    <apex:form >
+  
+   </apex:form>
+  
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+        <div class="navbar-header">          
+            <a class="navbar-brand" href="/apex/MainMenu"><span id="V-Logo">M</span>etadata <span id="V-Logo">U</span>tility </a>
+        </div>
+        
+        <div class="navbar-collapse collapse">
+          <apex:form styleclass="navbar-form navbar-right">
+          <!--<form class="navbar-form navbar-right" role="form">-->
+            <div class="form-group">          
+            </div>
+            <div class="form-group">             
+            </div>
+                          
+            <button type="submit" class="btn btn-warning" data-toggle="modal" data-target="#startRunPopUp" onclick="return false;" id="btn_runs">Start Run</button>
+            <!--<apex:commandButton styleclass="btn btn-warning"  onclick="return false;" value="Start Run" id="btn_runs"/>-->
+          <!--</form>-->
+        </apex:form>  
+        </div><!--/.navbar-collapse -->
+        
+      </div>
+    </div>    
+    
+   <div class="container-fluid" style="float: left;">
+    <img src="{!$Resource.Metadata_Utility_Logo}" style="width:220px; margin-top:20px;"/>    
+
+      <div class="row">
+      
+        <div class="col-sm-3 col-md-2 sidebar" style="width: 250px;">
+          <ul class="nav nav-sidebar">
+             <li ><a href="https://{!serverUrl}/setup/forcecomHomepage.apexp?setupid=ForceCom">Back to Setup</a></li>
+            <li ><a href="/apex/MainMenu">Home</a></li>
+            <li  ><a href="/apex/setting" id="menu_settings">Settings</a></li>
+            <li><a href="/apex/xmlBrowser" id="menu_objects">XML Browser</a></li>
+             <li  ><a href="/apex/CreateMetaData" id="menu_settings">Modify Metadata Component</a></li>
+            
+            <li ><a href="/apex/MultiselectExample" id="menu_mappings">Object Page Layout Mappings</a></li>
+            <li ><a href="/apex/MultiselectExample2" id="menu_runs">Record Type Picklist Mapping</a></li>
+            <li ><a href="/apex/ObjectExtraction" id="menu_mappings">Object Field Extraction</a></li>
+            <li class="active"><a href="/apex/WorkflowExtraction" id="menu_mappings">Activate/Deactivate Workflow</a></li>
+            <li><a href="#">Help</a></li>
+
+          </ul>
+         </div>
+       </div>
+    </div>   
+             
+
+          
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" style="margin: 0px; ">
+       
+        <h1 class="page-header">Activate/Deactivate Worklfow</h1>
+        <div class="row placeholders" />  
+        
+               
+        <div id="maincont">
+
+
+
+<apex:form id="form" >
+
+
+
+  <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-load.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-deflate.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-inflate.js')}"/>   
+        <!--  <apex:actionPoller action="{!checkAsyncRequest}" interval="5" rerender="form" rendered="{!NOT(ISNULL(AsyncResult))}" status="loadStatus"/>-->
+           <!--apex:actionPoller action="{!flowController}" interval="5" rerender="form" rendered="{!NOT(processNo >3)}"/-->
+      
+
+       
+
+<!-------------------------------------------------------------------------------------------------------------------------------->
+
+<apex:actionStatus startText="Retrieving Workflow. Please wait..." stopText="" id="stat"></apex:actionStatus>
+
+   <apex:pageMessages id="messages" escape="false"></apex:pageMessages>
+   <apex:actionStatus startText=""  stopText="" id="stat3"> 
+             <apex:facet name="start">
+               
+              <apex:image value="/img/loading.gif" > &nbsp;<b>Please Wait... Do not refresh the page.</b></apex:image>
+              </apex:facet>
+             
+             
+             </apex:actionStatus>
+        <apex:pageBlock >
+        
+        <apex:pageBlockSection columns="4">
+            <c:MultiselectPicklist leftLabel="Available Objects"
+                leftOption="{!allObject}"
+                rightLabel="Selected Object"
+                rightOption="{!selectedObject }"
+                size="14"
+                width="220px"/><br/><br/>
+               
+
+
+
+                    &nbsp; &nbsp;
+        <!-- <apex:outputLink value="{!URLFOR($Resource.SampleFiles,'/SampleFile/FieldTemplate.csv')}"><apex:image value="/img/func_icons/util/help16.png"/> &nbsp;Object Field Creation Template</apex:outputLink>-->
+                    </apex:pageBlockSection>
+                <br/>
+
+          <!--       <apex:inputCheckbox value="{!additionalCheck}" label="Need to Include Extrenal File for Display" onClick="showFileInput()"/> Need to Include External File for Display-->
+                  <apex:actionStatus startText=""  stopText="" id="stat2"> 
+             <apex:facet name="start">
+               
+              <apex:image value="/img/loading.gif" > &nbsp;<b>Please Wait... Do not refresh the page.</b></apex:image>
+              </apex:facet>
+             
+             
+             </apex:actionStatus>
+
+               
+
+
+            <apex:pageBlockButtons location="bottom" id="btn">
+            
+            <apex:commandButton action="{!getWorkflowDetails}"  value="Retrieve Workflow" status="stat" reRender="form,tab,messages"/>
+
+            </apex:pageBlockButtons>
+            <apex:pageBlockButtons >
+
+            
+            
+            </apex:pageBlockButtons>    
+            
+               
+            </apex:pageBlock>
+          
+        <apex:pageBlock id="tab"> 
+          <!-- <apex:actionPoller action="{!flowController}" interval="5" rendered="{!IF(processNo==1,true,false)}" reRender="tab,messages,form" status="stat"/> -->
+        <!--<apex:actionPoller action="{!getWorkflowDetails}" interval="5" rendered="{!IF(checkI==0,false,true)}" reRender="tab,messages" status="stat"/>   -->
+        <apex:actionPoller action="{!DeactivateWF}" interval="5" rendered="{!IF(WFDeactivateCheck==0,false,true)}" reRender="form,tab,messages"  id="DeactivateWFPoller"/>
+        <apex:actionPoller action="{!ActivateWF}" interval="5" rendered="{!IF(WFActivateCheck==0,false,true)}" reRender="form,tab,messages"  id="ActivateWFPoller"/>
+             <apex:pageBlockTable value="{!row}" var="j" >
+        
+        <apex:column >
+            <apex:facet name="header">
+                        <apex:inputCheckbox id="selectAll" onchange="toggleSelectAll(this);" label="Selected" title="Select All"> </apex:inputCheckbox>
+                    </apex:facet>
+ <!--           <apex:inputCheckbox id="allCB" headerValue="Selected?" />-->
+            <apex:inputCheckbox id="wfActiveCheck" styleClass="wfCB" value="{!j.isSelected}" onchange="toggleItem();"/>
+        </apex:column>
+
+    <!--            <apex:column ><apex:facet name="header" ><apex:inputCheckbox value="{!o.isprivate}"/>Selected</apex:facet></apex:column>             -->
+                <apex:column value="{!j.objectName}" style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Object'),true,false),true)}"><apex:facet name="header">Object</apex:facet></apex:column>
+             
+              
+            <apex:column style="text-align:center">
+                <apex:facet name="header">
+                    Active?
+                </apex:facet>   
+                <apex:inputCheckbox disabled="true" value="{!j.isActive}" style="{!IF(j.isNew==true,'background-color:#FFA500,text-align:center','text-align:center') }" />
+            </apex:column> 
+              
+              
+             <apex:column value="{!j.displayName}" style="{!IF(j.isNew==true,'background-color:#FFA500','')}" ><apex:facet name="header">Workflow Name</apex:facet></apex:column> 
+              
+              </apex:pageBlockTable>
+            <apex:pageBlockButtons location="bottom" id="btn2">  
+              
+              <apex:commandButton action="{!ActivateWFButton}"  value="Activate Workflow"  reRender="tab,messages" status="stat3"/>
+              <apex:commandButton action="{!DeactivateWFButton}"  value="Deactivate Workflow" reRender="tab,messages" status="stat3"/>
+           <!--   <apex:commandButton action="{!DeactivateWF}"  value="Deactivate" status="stat2" reRender="form,tab,messages"/>-->
+             </apex:pageBlockButtons> 
+              
+           <!-- {!row}-->
+          </apex:pageBlock>  
+            
+      
+   </apex:form>
+   
+   
+
+   
+
+        
+        </div>    
+        
+    </div>
+     </body>
+   <script>
+   </script>
+   
+</apex:page>

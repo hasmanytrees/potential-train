@@ -1,0 +1,300 @@
+<apex:page controller="MetadataUtility.MultiselectExampleControllerExtract1" sidebar="false" showHeader="false" readOnly="true" >
+
+
+
+
+ <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+      
+      <apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__Vaporizer_Stylesheet)}"/>
+      
+<script type="text/javascript" language="javascript"
+    src="https://cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+<script class="jsbin"
+    src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script><apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__tableJquery,'tableJQUERY/demo_Page.css')}" />
+<apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__tableJquery,'tableJQUERY/table.css')}" />
+<link rel="stylesheet"
+    href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"></link>
+     <style>
+     
+     .newRow{
+     
+       bgcolor:#FF0000;
+     
+     
+     }
+
+    #maincont #menu_settings{
+    display:block;
+    }
+
+     
+     </style>
+        
+    </head>
+    
+    <body> 
+    <apex:form >
+  
+   </apex:form>
+  
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+        <div class="navbar-header">          
+            <a class="navbar-brand" href="/apex/MainMenu"><span id="V-Logo">M</span>etadata <span id="V-Logo">U</span>tility </a>
+        </div>
+        
+        <div class="navbar-collapse collapse">
+          <apex:form styleclass="navbar-form navbar-right">
+          <!--<form class="navbar-form navbar-right" role="form">-->
+            <div class="form-group">          
+            </div>
+            <div class="form-group">             
+            </div>
+                          
+            <button type="submit" class="btn btn-warning" data-toggle="modal" data-target="#startRunPopUp" onclick="return false;" id="btn_runs">Start Run</button>
+            <!--<apex:commandButton styleclass="btn btn-warning"  onclick="return false;" value="Start Run" id="btn_runs"/>-->
+          <!--</form>-->
+        </apex:form>  
+        </div><!--/.navbar-collapse -->
+        
+      </div>
+    </div>    
+    
+   <div class="container-fluid" style="float: left;">
+    <img src="{!$Resource.Metadata_Utility_Logo}" style="width:220px; margin-top:20px;"/>    
+      <div class="row">
+      
+        <div class="col-sm-3 col-md-2 sidebar" style="width: 250px;">
+          <ul class="nav nav-sidebar">
+             <li ><a href="https://{!serverUrl}/setup/forcecomHomepage.apexp?setupid=ForceCom">Back to Setup</a></li>
+            <li ><a href="/apex/MainMenu">Home</a></li>
+            <li  ><a href="/apex/setting" id="menu_settings">Settings</a></li>
+            <li><a href="/apex/xmlBrowser" id="menu_objects">XML Browser</a></li>
+             <li  ><a href="/apex/CreateMetaData" id="menu_settings">Modify Metadata Component</a></li>
+            
+            <li ><a href="/apex/MultiselectExample" id="menu_mappings">Object Page Layout Mappings</a></li>
+            <li ><a href="/apex/MultiselectExample2" id="menu_runs">Record Type Picklist Mapping</a></li>
+            <li class="active"><a href="/apex/ObjectExtraction" id="menu_mappings">Object Field Extraction</a></li>
+            <li><a href="/apex/WorkflowExtraction" id="menu_mappings">Activate/Deactivate Workflow</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+         </div>
+       </div>
+    </div>   
+             
+          
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" style="margin: 0px; ">
+       
+        <h1 class="page-header">Object Field Extraction</h1>
+        <div class="row placeholders" />  
+        
+               
+        <div id="maincont">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<apex:form id="form" >
+
+
+  <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-load.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-deflate.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-inflate.js')}"/>   
+          <apex:actionPoller action="{!checkAsyncRequest}" interval="5" rerender="form" rendered="{!NOT(ISNULL(AsyncResult))}" status="loadStatus"/>
+           <!--apex:actionPoller action="{!flowController}" interval="5" rerender="form" rendered="{!NOT(processNo >3)}"/-->
+      
+
+       
+      <apex:outputPanel rendered="{!NOT(ISNULL(MetaDataRetrieveZip))}">
+            <apex:actionFunction name="receiveFile" action="{!receiveMetadataZipFile}" rerender="messages,messages2,files" oncomplete="unzip();" status="loadStatus" >
+                <apex:param name="filename" assignTo="{!MetadataFileName}" value=""/>
+                <apex:param name="filedata" assignTo="{!MetadataFileData}" value=""/>
+            </apex:actionFunction>  
+            <apex:actionFunction name="receiveComplete" action="{!receiveComplete}" rerender="form"/>
+            <c:unzip name="unzip" oncomplete="if(more) receiveFile(path, data); else receiveComplete();">{!MetaDataRetrieveZip}</c:unzip>
+        </apex:outputPanel>
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-------------------------------------------------------------------------------------------------------------------------------->
+
+<apex:actionStatus startText="Loading" stopText="" id="stat"></apex:actionStatus>
+
+   <apex:pageMessages id="messages" escape="false"></apex:pageMessages>
+        <apex:pageBlock >
+        <apex:pageBlockSection columns="4">
+            <c:MultiselectPicklist leftLabel="Available Objects"
+                leftOption="{!allObject}"
+                rightLabel="Selected Object"
+                rightOption="{!selectedObject }"
+                size="14"
+                width="220px"/><br/><br/>
+               
+                    &nbsp; &nbsp; <apex:outputLink value="{!URLFOR($Resource.MetadataUtility__SampleFiles,'/SampleFile/FieldTemplate.csv')}"><apex:image value="/img/func_icons/util/help16.png"/> &nbsp;Object Field Creation Template</apex:outputLink>
+                    </apex:pageBlockSection>
+                <br/>
+                 <apex:inputCheckbox value="{!additionalCheck}" label="Need to Include Extrenal File for Display" onClick="showFileInput()"/> Need to Include External File for Display
+                  <apex:actionStatus startText=""  stopText="" id="stat2"> 
+             <apex:facet name="start">
+               
+              <apex:image value="/img/loading.gif" > &nbsp;<b>Please Wait..</b></apex:image>
+              </apex:facet>
+             
+             
+             </apex:actionStatus>
+            <apex:pageBlockSection title="Add External Files" rendered="{!additionalCheck}">
+                
+                
+                   <apex:outputLabel value=" Choose file to input " style="font-weight:bold"></apex:outputLabel><br/>
+                  <apex:inputFile value="{!csvFileBody}"  filename="{!csvAsString}" title="Choose file to input"/>
+                
+                
+                
+                </apex:pageBlockSection>
+               
+            <apex:pageBlockButtons location="bottom" id="btn">
+            
+              <apex:commandButton action="{!getObjectDetails}"  value="Retrieve" status="stat" reRender="form,tab,messages"/>
+                <apex:commandButton action="{!export2Xls}"  value="Export to Excel"  />
+                  <apex:commandButton action="{!addAdditionalFields}"  value="Upload Additional File"  />
+                  
+                     <apex:commandButton action="{!flowController}"  value="Update MetaData"  />
+                        <!--apex:commandButton action="{!generateLog}"  value="Show Log" rendered="{!showLog}" /-->
+
+            
+            </apex:pageBlockButtons>
+            <apex:pageBlockButtons >
+            
+              <!--apex:commandButton action="{!dynamicCreation}"  value="FieldOnLayout" status="stat" reRender="tab,messages"/-->
+                
+            
+            
+            </apex:pageBlockButtons>    
+            
+               
+            </apex:pageBlock>
+          
+        <apex:pageBlock id="tab"> 
+           <apex:actionPoller action="{!flowController}" interval="5" rendered="{!IF(processNo==1,true,false)}" reRender="tab,messages,form" status="stat"/> 
+        <apex:actionPoller action="{!getObjectDetails}" interval="5" rendered="{!IF(checkI==0,false,true)}" reRender="tab,messages" status="stat"/>   
+             <apex:pageBlockTable value="{!row}" var="j" >
+             
+                <apex:column value="{!j.objectName}" style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Object'),true,false),true)}"><apex:facet name="header">Object</apex:facet></apex:column>
+                 
+                <apex:column value="{!j.apiName}" style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'API Name'),true,false),true)}"><apex:facet name="header" >Api Name</apex:facet></apex:column>
+                
+                <apex:column value="{!j.label}" style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Label'),true,false),true)}"> <apex:facet name="header">Label</apex:facet></apex:column>
+               <apex:column value="{!j.dataType}" style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Data type'),true,false),true)}"> <apex:facet name="header">Data Type</apex:facet></apex:column>
+               <apex:column value="{!j.length}"  style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Length'),true,false),true)}"> <apex:facet name="header">Length</apex:facet></apex:column>
+               <apex:column value="{!j.isExternal}"  style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Is External ?'),true,false),true)}"> <apex:facet name="header">Is External Id ?</apex:facet></apex:column>
+               <apex:column value="{!j.isRequired}"  style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Is Required ?'),true,false),true)}"> <apex:facet name="header">Is Required</apex:facet></apex:column>
+               <apex:column value="{!j.formula}"  style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Formula Value'),true,false),true)}"> <apex:facet name="header">Formula Value</apex:facet></apex:column>
+               <apex:column value="{!j.descp}"  style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Description'),true,false),true)}"> <apex:facet name="header">Description</apex:facet></apex:column>
+               <apex:column value="{!j.value1}"  style="{!IF(j.isNew==true,'background-color:#FFA500','')}" rendered="{!IF(checkICheck!=0,IF(CONTAINS(listVar.MetadataUtility__Object_Field_Extraction__c,'Value'),true,false),true)}"> <apex:facet name="header">Value</apex:facet></apex:column>
+              
+              
+              
+              
+              
+              </apex:pageBlockTable>
+           <!-- {!row}-->
+          </apex:pageBlock>  
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+    <apex:actionFunction name="showFileInput" action="{!showInputFile}" reRender="form" status="stat2"  />             
+            
+        <apex:actionFunction action="{!generateLog}" name="getNewLog"/>         
+   </apex:form>
+   
+   
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>    
+        
+    </div>
+     </body>
+   <script>alert(MetaDataType);
+   </script>
+   
+</apex:page>

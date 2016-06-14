@@ -1,0 +1,4 @@
+<apex:page standardController="Campaign">
+<!-- Campaign Community list view -->
+    <apex:enhancedList type="Campaign" height="800" rowsPerPage="25" id="CampaignList" />
+</apex:page>

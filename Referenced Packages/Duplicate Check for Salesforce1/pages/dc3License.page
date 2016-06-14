@@ -1,0 +1,279 @@
+<apex:page docType="html-5.0" controller="dupcheck.dc3ControllerLicense" cache="false" Title="License - Duplicate Check for Salesforce" sidebar="false" action="{!janitor}" tabstyle="dc3Setup__tab">
+
+	<apex:stylesheet value="{!URLFOR($Resource.dupcheck__dc3Assets,'/dc3/assets/css/bootstrap-namespaced.min.css')}" />
+	<apex:stylesheet value="{!URLFOR($Resource.dupcheck__dc3Assets,'/dc3/assets/css/fonts.css')}" />
+	<apex:stylesheet value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/style/duplicatecheck.css" />
+
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" />
+	<apex:includeScript value="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" />
+
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js" />
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular-sanitize.min.js" />
+
+	<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap.js" />
+	<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js" />
+
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/bootbox.min.js" />
+
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/duplicatecheck.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/duplicatecheck.license.js" />
+
+	<apex:includeScript value="../../soap/ajax/31.0/connection.js" />
+
+	<div class="bootstrap-sf1" ng-app="licenseApp" ng-controller="licenseController" data-sf-license="{!$RemoteAction.dc3ControllerLicense.getLicense}">
+		<div class="container-fluid">
+			<!-- NAV TOP BAR -->
+			<div class="row mg-t-10">
+				<div class="col-xs-6">
+					<button class="btn btn-sm btn-info" ng-click="openUrl('{!$Page.dc3Setup}')">Back to setup</button>
+				</div>
+				<div class="col-xs-6">
+					<div class="pull-right tools">
+						<a href="#" onClick="dcNavigate('http://ity.vc/app-license', '')" class="help">Help <i class="s1utility s1utility-help "></i></a>
+					</div>
+				</div>
+			</div>
+			<!-- /NAV TOP BAR -->
+
+
+			<div class="row" ng-init="endpoint.refreshLicense='{!$RemoteAction.dc3ControllerLicense.refreshLicense}'">
+				<div class="col-xs-12">
+					<div class="panel">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-6">
+									<h2 class="panel-title">License Information</h2>
+								</div>
+								<div class="col-xs-6 text-xs-left text-sm-right">
+									<button class="btn btn-success" ng-if="data.information.editionLabel == 'Free'" ng-click="openFreePlus('{!CASESAFEID($Organization.Id)}')">Get Free Plus</button>
+									<button class="btn btn-success" ng-if="data.information.editionLabel == 'Free Plus'" ng-click="openPricing()">Upgrade</button>
+									<button class="btn btn-info" ng-disabled="refreshing" ng-click="refreshLicense()">
+										<i class="s1utility s1utility-spinner s1utility-animate" ng-if="refreshing" /> <span ng-if="!refreshing">Refresh License</span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-xs-12">
+
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right">License Edition</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10" ng-bind-html="data.information.editionLabel"></div>
+
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right">License End</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">
+										<span ng-if="!data.information.licenseEnd">Never</span> <span ng-if="data.information.licenseEnd" ng-bind-html="data.information.licenseEnd | date: 'dd MMMM yyyy'" />
+									</div>
+
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right">Renewal Date</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">
+										<span ng-if="!data.information.renewalData">Never</span> <span ng-if="data.information.renewalData" ng-bind-html="data.information.renewalData | date: 'dd MMMM yyyy'" />
+									</div>
+
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right">Record Limit</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10" ng-bind-html="data.information.recordLimit"></div>
+									
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right">Organization Id</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">{!CASESAFEID($Organization.Id)}</div>
+									
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right">Organization Type</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10" ng-bind-html="(data.information.isSandbox ? 'Sandbox' : 'Production')">
+									
+									
+									
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right" ng-if="data.information.isTrial">Trial</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10" ng-if="data.information.isTrial">
+										<i class="s1utility s1utility-check text-success"  />
+									</div>
+										
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Sandbox Licenses</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10" ><span ng-bind-html="data.features.sandboxCount"/>&nbsp;
+										
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12">
+									<div class="col-xs-12">
+										<h2>Available functions</h2>
+									</div>
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Scenario Limit</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10" ><span ng-bind-html="data.features.scenarioCount"/>&nbsp;
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Batch Filter</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.batchFilter" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.batchFilter" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Batch Schedule</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.batchSchedule" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.batchSchedule" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Cross Object</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.crossObject" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.crossObject" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Record Type</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.recordType" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.recordType" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Custom Fields</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.customFields" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.customFields" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Custom Objects</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.customObjects" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.customObjects" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Standard Objects</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.standardObject" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.standardObject" />
+									</div>
+									
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Advanced Fuzzy Matching</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.advancedMatching" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.advancedMatching" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Merge Configuration</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.configuredMerge" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.configuredMerge" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Mutiple Merge</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.multipleMerge" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.multipleMerge" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Batch Merge</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.batchMerge" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.batchMerge" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Quick Merge</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.quickMerge" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.quickMerge" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Batch Convert</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.batchConvert" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.batchConvert" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Quick Convert</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.quickConvert" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.quickConvert" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Convert</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.pageConvert" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.pageConvert" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Merge</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.pageMerge" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.pageMerge" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Check</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.pageCheck" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.pageCheck" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Api Enabled</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.api" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.api" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Unique Upload</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.uniqueUpload" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.uniqueUpload" />
+									</div>
+
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Web2Lead</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.web2Lead" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.web2Lead" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Job</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.batchDeduplication" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.batchDeduplication" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Duplicate Prevention</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.duplicatePrevention" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.duplicatePrevention" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Basic Objects</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.basicObject" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.basicObject" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Batch Export</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.batchExport" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.batchExport" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Live</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.pageLayout" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.pageLayout" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Entry</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.pageEntry" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.pageEntry" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Discard</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.advancedDiscard" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.advancedDiscard" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">DC Direct</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.directProcessing" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.directProcessing" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Extension Plugins</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.plugin" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.plugin" />
+									</div>
+									
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Set For Merge</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.setForMerge" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.setForMerge" />
+									</div>
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Direct Processing</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.directProcessing" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.directProcessing" />
+									</div>
+									<Label class="col-xs-10 col-sm-2 text-sm-right text-xs-left">Audit Logging</Label>
+									<div class="col-xs-2 col-sm-4 mg-b-10">
+										<i class="s1utility s1utility-check text-success" ng-if="data.features.auditLogging" /> <i class="s1utility s1utility-close text-danger" ng-if="!data.features.auditLogging" />
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+								<div class="col-xs-12 text-right text-xs-left pd-r-30"></div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</apex:page>

@@ -1,0 +1,103 @@
+<apex:page StandardController="Account" extensions="AgencyFeedbackExtension"     >
+    <!-- Static Resource start-->
+    <apex:stylesheet value="{!URLFOR($Resource.StarRating,'rateit/src/rateit.css')}" />
+    <!-- Static Resource end-->
+ 
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet"/>
+    
+    <!--Script Block--->
+    <script src="{!$Resource.AjaxLibrary}"></script>
+     <script src="{!URLFOR($Resource.StarRating,'rateit/src/jquery.rateit.js')}" type="text/javascript"></script>
+     <script src="{!$Resource.jQueryLibrary}"></script>
+    <script>
+     var j$ = jQuery.noConflict();
+    
+    j$(document).ready(function(){
+    
+    j$('#creative').rateit('step',0.1);
+     //j$("#creative").bind('over', function (event,value) { j$(this).attr('title', value) });
+     j$('#creative').rateit('value','{!JSENCODE(TEXT(oAccount.Creative__c))}');
+      j$("#creative").tooltip();
+     //j$('#creative').rateit('readonly',j$('#creative').rateit('readonly'));
+     
+     j$('#cs').rateit('step',0.1);
+     //j$("#cs").bind('over', function (event,value) { j$(this).attr('title', value); });
+     j$('#cs').rateit('value','{!JSENCODE(TEXT(oAccount.Customer_Service__c))}');
+     j$("#cs").tooltip();
+     //j$('#cs').rateit('readonly',!j$('#cs').rateit('readonly'));
+     
+     j$('#timeliness').rateit('step',0.1);
+    // j$("#timeliness").bind('over', function (event,value) { j$(this).attr('title', value); });
+     j$('#timeliness').rateit('value','{!JSENCODE(TEXT(oAccount.timeliness__c))}');
+     j$("#timeliness").tooltip();
+     //j$('#timeliness').rateit('readonly',!j$('#timeliness').rateit('readonly'));
+     
+     
+     j$('#oe').rateit('step',0.1);
+     //j$("#oe").bind('over', function (event,value) { j$(this).attr('title', value); });
+     j$('#oe').rateit('value','{!JSENCODE(TEXT(oAccount.Overall_Experience__c))}');
+      j$("#oe").tooltip(); 
+    // j$('#oe').rateit('readonly',!j$('#oe').rateit('readonly'));
+    
+     
+     j$('#pricing').rateit('step',0.1);
+    // j$("#pricing").bind('over', function (event,value) { j$(this).attr('title', value); });
+     j$('#pricing').rateit('value','{!JSENCODE(TEXT(oAccount.pricing__c))}');
+      j$("#pricing").tooltip(); 
+     //j$('#pricing').rateit('readonly',!j$('#pricing').rateit('readonly')); 
+   
+  }); 
+  var parent_domain = '{!JSENCODE($CurrentPage.parameters.parent_domain)}';
+    </script>
+    <!--Script Block Ends -->
+    
+    
+    <!-- Agency FeedBack form starts, where it asks for user input-->
+    <apex:form id="form"> 
+    <!-- Below block hides all details from authorized User.It is determied by a custom label -->
+    <apex:pageMessages rendered="{!NOT(bIsAuthorized)}"></apex:pageMessages>
+    
+    <!--Below block shows start rating of various fields -->
+    <apex:pageBlock mode="mainDetail" rendered="{!bIsAuthorized}">
+    <apex:pageBlockSection >
+        <apex:pageBlockSectionItem >
+        <!-- For Creative -->
+        <apex:outputLabel title="Specify your Rating"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px" >Creative</apex:outputLabel>
+            
+            <div class="rateit" id="creative" style="margin-left:18px;"  data-rateit-readonly="true" value="{!oAccount.Creative__c}" title="{!oAccount.Creative__c}">
+                </div>
+      </apex:pageBlockSectionItem>
+      <apex:pageBlockSectionItem >
+          <!-- For Customer Service-->
+         <apex:outputLabel title="Specify your Rating"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px">Customer Service </apex:outputLabel>
+            
+            <div class="rateit" id="cs" style="margin-left:18px;"  data-rateit-readonly="true" value="{!oAccount.Customer_Service__c}" title="{!oAccount.Customer_Service__c}" >
+                </div>
+       </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+         <!-- For Timeliness -->
+          <apex:outputLabel title="Specify your Rating"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px" >Timeliness </apex:outputLabel>
+            
+            <div class="rateit" id="timeliness" style="margin-left:18px;"  data-rateit-readonly="true" value="{!oAccount.timeliness__c}" title="{!oAccount.timeliness__c}">
+                </div>
+           </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+             <!-- For Pricing-->
+              <apex:outputLabel title="Specify your Rating"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px" >Pricing </apex:outputLabel>
+                
+                <div class="rateit" id="pricing" style="margin-left:18px;" data-rateit-readonly="true" value="{!oAccount.pricing__c}" title="{!oAccount.pricing__c}" >
+                    </div>
+           </apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem > 
+           <!-- For Overall Experience--> 
+            <apex:outputLabel title="Specify your Rating"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px" >Overall Experience</apex:outputLabel>
+            
+            <div class="rateit" id="oe" style="margin-left:18px;" data-rateit-readonly="true" value="{!oAccount.Overall_Experience__c}" title="{!oAccount.Overall_Experience__c}" >
+                </div>
+             </apex:pageBlockSectionItem>
+       </apex:pageBlockSection>
+    </apex:pageBlock>
+    </apex:form>
+    <!-- Agency FeedBack form ends -->
+
+</apex:page>

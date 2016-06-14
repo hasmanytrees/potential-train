@@ -1,0 +1,79 @@
+<apex:page controller="ChooseMethodToResubmitController" sidebar="false" showHeader="false" showChat="false">
+  
+     <!-- Script Static Resource Start-->
+    <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+    <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/> 
+ <!-- Below Script is used to show loading in Action Status  --->
+  <apex:form id="form">
+           <script>  
+             $j = jQuery.noConflict(); 
+             
+              $j(document).ready(function(){
+              
+               getFile();  // Action function to initiate call to ESB to get file from Perceptive 
+              }
+              );
+             //function to block the whole page  
+             function blockPage(){   
+           //  alert("hii");
+               $j.blockUI({ message: '<img src="/img/loading32.gif" /><br/><br/><h1> Please wait...</h1>',   
+                 css: {   
+                  border: 'none',   
+                  padding: '15px',   
+                  '-webkit-border-radius': '10px',   
+                  '-moz-border-radius': '10px',   
+                  opacity: .9  
+                 }   
+               });  
+             //  alert("hii2"); 
+               return false;  
+             }  
+             //function to unblock the page  
+             function unblockPage(){  
+               $j.unblockUI();  
+             }  
+        
+             function closeButton(){
+                    if('{!$Site.Prefix}'!=''){
+                window.top.location='/agencyportal/{!sSBCId}';
+                
+                }
+                else{
+                
+                   window.top.location='/{!sSBCId}';
+                }
+                  
+                  
+                  }
+        
+        </script>
+        
+         
+ 
+  <apex:pageMessages ></apex:pageMessages>
+   <apex:actionStatus onstart="blockPage()" onstop="unblockPage()" id="blockUI"/>  <!-- Action Status to block whole page with loading -->
+      <apex:pageBlock >
+      <apex:pageBlockSection >
+            <apex:pageBlockSectionItem >
+        <apex:outputLabel title="Choose Delivery Type"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px" >Choose Delievary Type</apex:outputLabel>
+           <apex:selectList value="{!sSelectedMethod}" size="1">
+           
+             <apex:selectOptions value="{!lstAllDelivaryOption}"></apex:selectOptions>
+           </apex:selectList>
+       </apex:pageBlockSectionItem>
+     </apex:pageBlockSection>
+      <apex:pageBlockButtons location="bottom">
+        <apex:commandButton value="Send Communication" action="{!sendToXMpie}" reRender="form" status="blockUI"/>
+        <input type="button" class="btn" onClick="closeButton();" value="Cancel"/>
+      </apex:pageBlockButtons>
+      </apex:pageBlock>
+  
+  </apex:form>
+
+
+
+
+
+</apex:page>

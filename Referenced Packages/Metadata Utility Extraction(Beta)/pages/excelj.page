@@ -1,0 +1,51 @@
+<apex:page controller="MetadataUtility.MultiselectExampleController"  contentType="txt/xml#myTest.xls" cache="true" action="{!loadMain}">
+<apex:outputText value="{!xlsHeader}" />
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+    <Styles>
+        <Style ss:ID="Default" ss:Name="Normal">
+            <Alignment/>
+            <Borders/>
+            <Font/>
+            <Interior/>
+            <NumberFormat/>
+            <Protection/>
+        </Style>
+    </Styles>
+  <apex:repeat value="{!opList}" var="j">
+    <Worksheet ss:Name="{!j}">
+        <Table x:FullColumns="1" x:FullRows="1">
+         <Row>
+                 <Cell><Data ss:Type="String">Object</Data></Cell>
+                  <Cell><Data ss:Type="String">Layout</Data></Cell>
+                    <Cell><Data ss:Type="String">API Name</Data></Cell>
+                    <Cell><Data ss:Type="String">Label</Data></Cell>
+                    <Cell><Data ss:Type="String">Data type</Data></Cell>
+                     <Cell><Data ss:Type="String">Length</Data></Cell>
+                      <Cell><Data ss:Type="String">Is Required ?</Data></Cell>
+                </Row>
+            <apex:repeat value="{!opList[j]}" var="c">
+                <Row>
+                 <Cell><Data ss:Type="String">{!c.objectName}</Data></Cell>
+                  <Cell><Data ss:Type="String">{!c.layouName}</Data></Cell>
+                    <Cell><Data ss:Type="String">{!c.apiName}</Data></Cell>
+                    <Cell><Data ss:Type="String">{!c.label}</Data></Cell>
+                    <Cell><Data ss:Type="String">{!c.dataType}</Data></Cell>
+                     <Cell><Data ss:Type="String">{!c.length}</Data></Cell>
+                      <Cell><Data ss:Type="String">{!c.required}</Data></Cell>
+                </Row>
+            </apex:repeat>
+        </Table>
+    </Worksheet>
+ </apex:repeat>
+   <!-- <Worksheet ss:Name="Cases">
+        <Table x:FullColumns="1" x:FullRows="1">
+            <apex:repeat value="{!Account.Cases}" var="c">
+                <Row>
+                    <Cell><Data ss:Type="String">{!c.Id}</Data></Cell>
+                    <Cell><Data ss:Type="String">{!c.CaseNumber}</Data></Cell>
+                </Row>
+            </apex:repeat>
+        </Table>
+    </Worksheet>-->
+</Workbook>
+</apex:page>

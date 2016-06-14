@@ -1,0 +1,76 @@
+<apex:page standardController="Lead" extensions="LeadMassActionExtension" >
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/> 
+  
+  <!-- below script to show loading during action status -->
+   <script>  
+     $j = jQuery.noConflict(); 
+     
+      
+     //function to block the whole page  
+     function blockPage(){   
+    //alert("hii");
+       $j.blockUI({ message: '<img src="/img/loading32.gif" /><h1> Loading...</h1>',   
+         css: {   
+          border: 'none',   
+          padding: '15px',   
+          '-webkit-border-radius': '10px',   
+          '-moz-border-radius': '10px',   
+          opacity: .9  
+         }   
+       });  
+     //  alert("hii2"); 
+       return false;  
+     }  
+     //function to unblock the page  
+     function unblockPage(){  
+       $j.unblockUI();  
+     }
+     
+     
+      
+       
+  </script>
+    <apex:form id="form">
+    
+    <apex:actionStatus onstart="blockPage()" onstop="unblockPage()" id="blockUI"/>  
+   
+    <apex:actionFunction action="{!ShowLeadClosedReason}" reRender="form" status="blockUI" name="showStatus"  />
+          <apex:SectionHeader subTitle="Change Status" />
+          <apex:pageMessages ></apex:pageMessages>
+          <apex:outputLabel value="Select New Status" style="font-weight:bold"></apex:outputLabel>
+          
+         <apex:pageBlock >
+         
+            <apex:pageBlockSection columns="1">
+              <apex:pageBlockSectionItem >
+                  <apex:outputLabel value="Lead Status" style="font-weight:bold;font-size:91%;color:#4a4a56;margin-left:50px" for="statusVal"></apex:outputLabel>
+                 <apex:inputField value="{!oLead.Status}" required="true" onchange="showStatus()" onChange="showStatus()" id="statusVal" /> <!-- On change looking for if status is "Closed" -->
+               </apex:pageBlockSectionItem> 
+                
+               <apex:pageBlockSectionItem >
+                   <apex:panelGrid columns="3" rendered="{!bIsShowLeadClosedReason}">
+                     <apex:outputLabel value="Closed Reason  " style="font-weight:bold;font-size:91%;color:#4a4a56;margin-left:140px"></apex:outputLabel>&nbsp;
+                    <apex:outputpanel layout="block" styleClass="requiredInput">
+                    <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel> 
+                  <apex:inputField value="{!oLead.Lead_Closed_Reason__c}"  rendered="{!bIsShowLeadClosedReason}" id="reasonVal" label="Closed Reason"  /> <!-- This field is visible only on Lead status "Closed" -->
+             </apex:outputpanel>
+           </apex:panelGrid>
+           </apex:pageBlockSectionItem>
+             </apex:pageBlockSection>
+           
+         
+              <apex:pageBlockButtons location="bottom" >
+              
+                  <apex:commandButton value="Save" action="{!save}" immediate="true"/>
+                  <input type="button" class="btn" onclick="window.top.location='/{!oLead.Id}'" value="Cancel"/>
+              
+              </apex:pageBlockButtons>
+         
+         </apex:pageBlock>
+    
+    
+    </apex:form>
+</apex:page>

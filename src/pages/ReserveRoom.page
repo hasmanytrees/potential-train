@@ -1,0 +1,206 @@
+<apex:page controller="ReserveEventRoomController" sidebar="false" tabStyle="Event_Room__c">
+  
+  <apex:includescript value="{!URLFOR($Resource.jQuery_Lib)}"/>
+  <script type="text/javascript" language="javascript" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery.js')}"></script>  
+   <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+   <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+   <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+ 
+ <!--Below block for jQuery Script ---> 
+   <script type="text/javascript">
+        var j;
+        var b;
+        $(document).ready(function(){
+          //alert("hiiii");
+           // for jquery table plugin
+            var i=0;
+            $("[id$='selectCheck1']").each(function() {
+           $(this).attr('name',  i);
+           i++;
+        });
+           
+            oTable =  $("[id$='result']").dataTable({
+               //"bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "sPageLast":"last",
+               
+                 "iDisplayLength": 10
+                  
+                
+            });
+           
+             
+           
+           
+           $("[id$='header']").css("cursor","pointer");
+           });
+           
+           //Below function to reload table plugin on rerender
+            function tableHandler()
+            {
+           oTable =  $("[id$='result']").dataTable({
+               //"bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "sPageLast":"last",
+             
+                 "iDisplayLength": 10
+                
+            });
+            
+            // alert(oTable.fnGetData());
+            
+            console.log(oTable.fnGetData());
+            //dataTables_info
+           // alert($(".dataTables_paginate paging_full_numbers").len);
+            $(".dataTables_length").eq(0).remove();
+            $(".dataTables_filter").eq(0).remove();
+            $(".dataTables_info").eq(1).remove();
+             $(".dataTables_paginate.paging_full_numbers").eq(1).remove();
+                $("[id$='header']").css("cursor","pointer");
+              
+           
+           }
+           
+           
+           
+             
+            function storeAll()
+             {
+             
+                 alert( document.getElementById("selectCheck1"));
+             
+             
+             storebSelected();
+             
+             }  
+             
+             function tagg()
+              {
+                
+                if($("[id$='selectCheck']").prop("checked")==true) 
+                 {
+                
+                 
+                  tagAllfunc();
+                 }
+                 else
+                 {
+                 
+                    untagAllfunc();
+                 
+                 }
+              
+              }  
+           
+           
+            function savebSelected()
+          {
+          
+            //  tableHandler();
+                
+               var sData = $('input:checkbox', oTable.fnGetNodes()).serialize();
+             sData=sData+"&";
+               var array=sData.split("=on&");
+               var recList;
+               recList=',';
+               for(var index=0;index<array.length-1;index++)
+                {
+               
+                  recList+=array[index]+',';
+                  
+                  
+                }
+              //   alert( "The following data would have been submitted to the server: \n\n"+array);
+               tagRec(recList);
+            // alert(array);
+               
+                return true;
+                 
+                 }
+           
+           </script>
+        
+<apex:form >
+
+    <apex:pageMessages id="message" escape="false"> </apex:pageMessages>
+       <apex:actionStatus id="loading" startText="Loading" >
+        <apex:facet name="start">
+          <apex:image value="{!$Resource.Loading_Image}" id="loadingImage" style=" padding-top:250px;padding-left:600px;  align:center;position:absolute ; opacity:0.65 ; z-index:78;"/>
+      </apex:facet>
+      </apex:actionStatus>
+      <apex:sectionHeader title="Reserve Event Room" subtitle="Add Event Room to Event Location"/>
+    
+       <apex:pageBlock >
+       
+          <!-- Below blocks shows Venue,Event Location details --->
+          <apex:pageBlockSection title="Event Details" columns="2" collapsible="false">
+          
+          <apex:outputLabel value="Event Location" style="font-weight:bold;"></apex:outputLabel>
+          <apex:outputLabel value="Venue Details"  style="font-weight:bold;"></apex:outputLabel>
+           <apex:outputLink value="/{!sEventId}" title="Event Location">{!sEventName}</apex:outputLink>
+            <apex:outputLink value="/{!sVenueId}" title="Venue Details">{!sVenueName}</apex:outputLink>
+        
+          </apex:pageBlockSection>
+       <br/>
+     
+        <!-- Below component to show filter search component --->
+        <c:FilterList DefaultSize="3" HeaderTitle="Search Room"   inputFilterValues="{!filterListHandler}" logic="AND" ></c:FilterList>
+       
+        <apex:commandButton value="Search" action="{!search}" reRender="result" oncomplete="tableHandler()" status="loading" disabled="{!bButtonDisabled}"/>
+        <apex:commandButton value="Add Room" onclick="savebSelected();return false;" disabled="{!bButtonDisabled}" />
+        <apex:commandButton value="Close" action="{!close}"/>
+        
+      </apex:pageBlock> 
+      
+        <apex:pageBlock >
+          <apex:pageBlockSection title="Search Result" columns="1" collapsible="false">
+          
+          
+          <!-- Below table shows list of retrieved room based on Venue --->
+          <apex:pageBlockTable value="{!lstRoomWrapper}" var="j" id="result">
+       
+               
+                   <!-- Checkbox to show record --->
+                   <apex:column style="width:40px" >
+                    
+                      <apex:facet name="header">Reserve
+                      <apex:inputCheckbox id="selectCheck" label="Select All"  title="Select/Deselect All" onclick="tagg()" value="{!bTaggAll}"/>
+                      
+                      </apex:facet>
+                      <apex:inputCheckbox id="selectCheck1"  value="{!j.bSelected}" disabled="{!j.bSaved}" title="check" />
+                    
+                    </apex:column>
+                  
+                    <apex:column >
+                    
+                      <apex:facet name="header">Room Name</apex:facet>
+                       <apex:outputLink value="/{!j.oRoom.Id}">{!j.oRoom.Name}</apex:outputLink>
+                    
+                    </apex:column>
+                    
+                  <!-- Gets fields based on Field set --->
+                  <apex:repeat value="{!lstFieldSetMember}" var="f">
+                    <apex:column value="{!j.oRoom[f]}">
+                   
+                      <apex:facet name="header">{!f.label}</apex:facet>
+                    
+                   </apex:column>
+                </apex:repeat> 
+          </apex:pageBlockTable>
+      </apex:pageBlockSection>
+     </apex:pageBlock>
+    
+    
+      <apex:actionFunction name="storebSelected" action="{!save}"/>
+       <apex:actionFunction name="tagAllfunc" action="{!taggAll}" reRender="result" oncomplete="tableHandler()"  /> <!-- This function is used to tag all functionality -->
+        <apex:actionFunction name="untagAllfunc" action="{!untaggAll}" reRender="result" oncomplete="tableHandler()" /> <!-- This function is used to untag all functionality -->
+        <apex:actionFunction name="tagRec" action="{!save}" reRender="result,message" status="loading" oncomplete="tableHandler()" >
+      
+      
+        <apex:param name="id" value="" assignTo="{!sRecordId}"/>
+      
+      </apex:actionFunction>
+      
+</apex:form>
+
+</apex:page>

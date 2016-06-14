@@ -1,0 +1,52 @@
+<apex:page controller="ChooseSurveyTemplateController" showHeader="false" sidebar="false" showChat="false">
+ <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/> 
+ 
+  <!-- Script is using to show loading on Action status -->
+   <script>  
+     $j = jQuery.noConflict(); 
+     $j(document).ready(function(){
+     
+     createSurvey();  //Action function to call cloning function 
+     
+     });
+      
+     //function to block the whole page  
+     function blockPage(){   
+   //  alert("hii");
+       $j.blockUI({ message: '<img src="/img/loading32.gif" /><h1> Loading...</h1>',   
+         css: {   
+          border: 'none',   
+          padding: '15px',   
+          '-webkit-border-radius': '10px',   
+          '-moz-border-radius': '10px',   
+          opacity: .9  
+         }   
+       });  
+     //  alert("hii2"); 
+       return false;  
+     }  
+     //function to unblock the page  
+     function unblockPage(){  
+       $j.unblockUI();  
+     }  
+  </script>
+
+ <apex:form id="form">
+ <apex:pageMessages ></apex:pageMessages>
+      <apex:actionStatus onstart="blockPage()" onstop="unblockPage()" id="blockUI"/>  <!-- Action Staus to show laoding blocking whole  page -->
+      <apex:actionFunction name="createSurvey" action="{!createSurvey}" reRender="form" status="blockUI" />
+     <apex:pageBlock >
+        <apex:pageBlockButtons location="bottom">
+         
+          <input type="button" class="btn" onclick="window.top.location='/{!JSENCODE(sEventLocationId)}'" value="Close"/>
+      
+      
+      </apex:pageBlockButtons>
+  </apex:pageBlock>    
+ 
+ </apex:form>
+ 
+</apex:page>

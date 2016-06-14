@@ -1,0 +1,7 @@
+<apex:page standardController="Influencer__c" >
+     <apex:detail subject="{!Influencer__c.Campaign__c}" />
+     <!-- Gives Alert on Standard Campaign Detail Page, Influencer related List when Edit or delete link on Influencer list is clicked -->
+     <script>  
+         alert('To modify Influencer please click Add/Edit Influencer Button');
+     </script>   
+</apex:page>

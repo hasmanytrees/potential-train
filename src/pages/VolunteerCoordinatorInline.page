@@ -1,0 +1,103 @@
+<apex:page standardController="Campaign" extensions="VolunteerCoordinatorInlineExtension" id="Page" tabstyle="Campaign" showHeader="false" showChat="false" sidebar="false" >
+   
+   <!-- Script to load basic jQuery and Block whole page on load plugin--->
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/>
+   
+   
+ 
+    <apex:form id="form">     
+   
+  <script type="text/javascript">
+   $j = jQuery.noConflict(); 
+  
+    function blockPage(){   
+   //  alert("hii");
+       $j.blockUI({ message: '<img src="/img/loading32.gif" /><h1> Saving...</h1>',   
+         css: {   
+          border: 'none',   
+          padding: '10px',   
+          '-webkit-border-radius': '10px',   
+          '-moz-border-radius': '10px',   
+          opacity: .9  
+         }   
+       });  
+     //  alert("hii2"); 
+       return false;  
+     }  
+     //function to unblock the page  
+     function unblockPage(){  
+       $j.unblockUI();  
+     }  
+      
+  
+ 
+</script>
+ 
+       <apex:pageMessages id="msg"></apex:pageMessages>
+       
+        <apex:PageBlock id="PageBlock" mode="mainDetail"   >
+      
+        <apex:actionStatus onstart="blockPage()" onstop="unblockPage()" id="stat"/>   
+        <apex:pageblockButtons location="top">
+        
+        <!-- Below links toogles between readonly and input mode based on user input --->
+        <apex:commandLink action="{!showInput}" value="Assign/Change Volunteer Coordinator" rendered="{!NOT(bFlag)}"/> 
+        <apex:commandButton value="Save" action="{!save}" rendered="{!bFlag}"  status="stat" reRender="form" oncomplete="if('{!bIsErrorOccured}'=='false'){window.top.location='/{!oEventLocation.Id}';}"/>
+        <apex:commandButton value="Cancel" action="{!showInput}" rendered="{!bFlag}"/>
+     
+     </apex:pageblockButtons>  
+     
+        <apex:outputPanel layout="block"  id="divArea" style="width:1400px" rendered="{!bFlag}" > &nbsp;&nbsp;
+         <apex:pageBlockSection columns="1">
+         
+         <apex:pageBlockSectionItem >
+          <Apex:outputLabel value="Volunteer Coordinator  " style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:50px;margin-right:20px;"></Apex:outputLabel>   
+           <apex:selectList value="{!sSelectedVC}" size="1">
+           
+               <apex:selectOptions value="{!lstVolunteerCoordinatorPicklist}"></apex:selectOptions>
+           
+           
+           </apex:selectList>
+          </apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem >
+             <Apex:outputLabel value="Volunteer Coordinator Manager " style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:50px;margin-right:20px;"></Apex:outputLabel>    
+           <apex:selectList value="{!sSelectedVCManager}" size="1">
+           
+               <apex:selectOptions value="{!lstVolunteerCoordinatorManagerPicklist}"></apex:selectOptions>
+           
+           
+           </apex:selectList>
+            </apex:pageBlockSectionItem>
+           
+     </apex:pageBlockSection>    
+            </apex:outputPanel> <br/>
+         
+          <apex:outputPanel rendered="{!NOT(bFlag)}" layout="block">
+        
+   <apex:pageBlockSection columns="1">  
+         
+         <apex:pageBlockSectionItem > 
+           <Apex:outputLabel value="Volunteer Coordinator"   style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:50px;margin-right:20px;" for="User3"></Apex:outputLabel>   
+        
+         <apex:outputLink id="User4"   value="/{!oEventLocation.Volunteer_Coordinator__c}"   target="_parent"  >{!oEventLocation.Volunteer_Coordinator__r.Name}</apex:outputLink>   
+        </apex:pageBlockSectionItem> 
+       <apex:pageBlockSectionItem >  
+         <Apex:outputLabel value="Volunteer Coordinator Manager " style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:50px;margin-right:20px;" for="User3"></Apex:outputLabel>   
+        
+         <apex:outputLink id="User3"   value="/{!oEventLocation.Event_Volunteer_Manager__r.Id}"  target="_parent"  >{!oEventLocation.Event_Volunteer_Manager__r.Name}</apex:outputLink>   
+        </apex:pageBlockSectionItem> 
+  </apex:pageBlockSection>
+    
+     </apex:outputPanel>
+     
+     </apex:PageBlock>
+     
+        <apex:actionFunction action="{!showInput}" name="showInput" reRender="form" status="stat"/>
+        
+    </apex:form>
+   
+       
+</apex:page>

@@ -1,0 +1,155 @@
+<apex:component controller="FilterListCompController">
+
+<!---------attribute list started---------------------------------------------->
+
+ <apex:attribute name="inputFilterValues" type="FilterListHandler" required="true"  description="It is the oject of the controller to store values " assignTo="{!filterListHandler}" />
+ <apex:attribute name="MinSize" type="Integer" description="It is the minimum size " assignTo="{!iMaxSize}"/>
+ <apex:attribute name="MaxSize" type="Integer" description="It is the maximum size " assignTo="{!iMinSize}"/>
+  <apex:attribute name="DefaultSize" type="Integer" description="It is the default size " assignTo="{!iDefaultSize}"/>
+  <apex:attribute name="MaxResultSize" type="boolean" description="Use true to render it on the page" assignTo="{!bDisplayMaxResultSize}"/>
+  <apex:attribute name="logic" type="String" required="true" description="Use use AND or OR" assignTo="{!sLogicString}"/>
+   
+   <apex:attribute name="HeaderTitle" type="String"  description="title for page Block" assignTo="{!pageBlockTitle}"/> 
+   <apex:includescript value="{!URLFOR($Resource.jQuery_Lib)}"/>
+
+   <style>
+   
+   
+   a.linkCSS{
+   
+      color :blue;
+   
+   
+   }
+  .g
+  {
+    
+    border-radius:5px;
+     width:1270px;
+     padding-top:5px;
+     padding-left:10px;
+     background-repeat:repeat;
+     //padding-right:650px;
+     background-color: #f2f2f2;
+   //  margin-right:-100px;
+//border-top: 1px solid #999;
+border: 1px solid #999;
+z-index: 50;
+}
+  
+  
+  } 
+   
+   </style>
+   <script>
+   
+      $(document).ready(function(){
+   
+        $("[id$='keyword']").parent("td").css("width","50px");
+   
+   
+   
+   });
+   
+   
+   </script>
+   
+  
+   
+<!-- ----------------------Filter  List using repeat-------------------------------------------->
+<apex:pageBlock title="{!pageBlockTitle}" > 
+ <apex:pageBlockSection columns="2"   >
+    
+  
+  
+     <apex:panelGrid columns="2"  styleClass="g">
+     
+      
+        <apex:facet name="header">By Keyword &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By Field Filter </apex:facet>
+      
+       <apex:inputText value="{!filterListHandler.sKeyWordSearch}" id="keyword"/>  
+
+      
+    <apex:panelGrid columns="7" id="filter"  style="width:80%">
+     
+     
+     <apex:repeat value="{!counter}" var="j" >
+     
+     
+      <apex:selectList value="{!selectedFirstParam}" size="1" style="width:200px">   <!------Field List----------------->
+      
+        <apex:selectOptions value="{!filterListHandler.fieldList}"></apex:selectOptions>
+       
+      </apex:selectList>&nbsp;&nbsp;&nbsp;
+    
+     <apex:selectList value="{!selectedSecondParam}" size="1" style="width:100px" >          <!------Operator  List----------------->
+      
+        <apex:selectOptions value="{!filterListHandler.operatorList}"></apex:selectOptions>
+       
+      </apex:selectList>&nbsp;&nbsp;&nbsp;
+    
+      <apex:inputText value="{!selectedThirdParam}"/>  <!------input value----------------->
+      
+   &nbsp;  <apex:outputText value=" {!sLogicString} " rendered="{!IF(j==iLastRow,false,true)}" style="padding:top:10px">  </apex:outputText>  
+       <apex:commandLink value="{!sLinkName}" styleClass="linkCSS" action="{!oneLinkCounter}" reRender="filter" rendered="{!IF((j==iLastRow)&&(bShowlink==true),true,false)}"/>
+ 
+      
+ <!--  <apex:panelGrid columns="1"> -->
+   
+   <!------------------------------Add/ Remove link----------------------->   
+     
+    <!-- <apex:commandLink value="Add Filter" action="{!increaseCounter}" reRender="filter" rendered=""/>
+     <apex:commandLink value="Remove Filter" action="{!removeCounter}" reRender="filter" rendered="{!IF((j==iLastRow)&&(iLastRow!=0),true,false)}"/>
+ 
+   </apex:panelGrid> --><div style="line-height: 7px;"><br/></div>
+
+    </apex:repeat>
+    <apex:panelGrid columns="2" style="padding-top:2px;width:250px"  rendered="{!bDisplayMaxResultSize}">
+     
+    <apex:outputlabel value="Maximum Search Result" for="max" style="font-weight:bold"> </apex:outputlabel>
+      <apex:inputText value="{!filterListHandler.iMaxResultSize}"  label="Maximum Search Result" rendered="{!bDisplayMaxResultSize}" size="20" id="max" />  
+   
+   </apex:panelGrid>
+     
+     
+    </apex:panelGrid>  
+    
+   
+       
+   </apex:panelGrid>  
+    
+    
+     
+
+     
+      
+   
+ 
+   
+   
+  
+  
+ <!---------------------Max Result Size--------------------------------------->
+  
+ 
+ 
+  
+  </apex:pageBlockSection> 
+
+</apex:pageBlock> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</apex:component>

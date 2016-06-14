@@ -1,0 +1,54 @@
+<apex:page sidebar="false" showChat="false" controller="FileDownloaderController" showHeader="false" >
+ 
+ 
+ <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/> 
+ <!-- Below Script is used to show loading in Action Status  --->
+   <script>  
+     $j = jQuery.noConflict(); 
+     
+      $j(document).ready(function(){
+      
+       getFile();  // Action function to initiate call to ESB to get file from Perceptive 
+      }
+      );
+     //function to block the whole page  
+     function blockPage(){   
+   //  alert("hii");
+       $j.blockUI({ message: '<img src="/img/loading32.gif" /><br/><br/><h1> Downloading your file.Please wait...</h1>',   
+         css: {   
+          border: 'none',   
+          padding: '15px',   
+          '-webkit-border-radius': '10px',   
+          '-moz-border-radius': '10px',   
+          opacity: .9  
+         }   
+       });  
+     //  alert("hii2"); 
+       return false;  
+     }  
+     //function to unblock the page  
+     function unblockPage(){  
+       $j.unblockUI();  
+     }  
+ 
+</script>
+
+ 
+ <apex:form id="form">
+   <apex:pageMessages rendered="{!bShow}"></apex:pageMessages> <!-- this is only visible in case of some error only -->
+  <apex:actionStatus onstart="blockPage()" onstop="unblockPage()" id="blockUI"/>  <!-- Action Status to block whole page with loading -->
+   <apex:actionFunction name="getFile" action="{!getFileFromPerceptive}" status="blockUI" reRender="form"/>
+         <apex:outputPanel layout="block" rendered="{!bShowLink}" >
+        <!--apex:outputLink target="_blank" value="data:{!sMIMEType};content-disposition:attachment;base64,{!sBlobFileStr}">Download</apex:outputLink--> 
+               <!-- Below section uses iFrame to load content and show it on visualforce page -->
+                <iframe src="data:{!sMIMEType};content-disposition:attachment;base64,{!sBlobFileStr}"  width="100%" height="1500" scrolling="true"/> <!-- it gets content type dynamically from controller -->
+       
+         </apex:outputPanel>
+         
+</apex:form>  
+  
+  
+</apex:page>

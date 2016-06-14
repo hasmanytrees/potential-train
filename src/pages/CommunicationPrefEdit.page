@@ -1,0 +1,29 @@
+<apex:page controller="CommunicationPrefEditExtension" >
+ 
+   <apex:form >
+   
+      <apex:sectionHeader title="{!sCommPrefName} Edit" subtitle="Communication Preferences"/>
+     <apex:pageBlock >
+     
+       <apex:pageBlockSection >
+       <!-- Below section renders related fields -->
+       <apex:repeat value="{!lstFieldName}" var="fieldVar">
+           <apex:inputField value="{!oCommPref[fieldVar]}"/>
+       
+       </apex:repeat>
+       
+      
+       </apex:pageBlockSection>
+       <!-- Button Blocks -->
+     <Apex:pageBlockButtons location="bottom">
+      <apex:commandButton value="Save" action="{!save}"/>
+        <input type="button" class="btn" value="Cancel" onClick="window.top.location='/{!accountId}'"/>
+     </Apex:pageBlockButtons>
+     
+     
+     </apex:pageBlock>
+   
+   
+   </apex:form>
+ 
+</apex:page>

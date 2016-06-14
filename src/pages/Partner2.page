@@ -1,0 +1,179 @@
+<apex:page standardController="Account" extensions="PartnerTypeInlineExtension" sidebar="false" showChat="false" showHeader="false" action="{!getFieldsOnLoad}">
+
+    <!-- Script Static Resource Start-->
+    <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/> 
+ 
+   <!-- JQuery block to load loading image -->
+   <script>  
+     $j = jQuery.noConflict(); 
+     $j(document).ready(function(){
+     
+        $j("a").each(function(){
+        
+          $j(this).attr("target","_parent"); // Sets hyperlink with attribute _Parent
+        
+        });
+     
+     });
+      
+     //function to block the whole page  
+     function blockPage(){   
+   //  alert("hii");
+       $j.blockUI({ message: '<img src="/img/loading32.gif" /><h1> Loading...</h1>',   
+         css: {   
+          border: 'none',   
+          padding: '15px',   
+          '-webkit-border-radius': '10px',   
+          '-moz-border-radius': '10px',   
+          opacity: .9  
+         }   
+       });  
+     //  alert("hii2"); 
+       return false;  
+     }  
+     //function to unblock the page  
+     function unblockPage(){  
+       $j.unblockUI();  
+     }  
+  
+        // This function calls Action function to get related fields based on user selected partner type
+        function showField(fieldName,fieldDOMId){
+        //alert(fieldName+'  '+$("[name$=\'"+fieldDOMId+"\']").is(":checked"));
+        if($j("[name$=\'"+fieldDOMId+"\']").is(":checked"))
+        displayFields(fieldName);
+        else
+        removeDisplayFields(fieldName);
+        //alert(fieldName);
+        
+        }
+        
+        function cancel(){
+        window.top.location='/{!accountId}';
+        
+        
+        }
+
+    </script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+    <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+    <link rel="stylesheet"  href="https://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"></link>
+    
+    <!-- JQuery plugin initiate for table --->
+    <script>
+  $(document).ready(function(){
+     //alert("hii");
+          $("[Id$='historyTable']").dataTable({
+       //"bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "sPageLast":"last",
+         "iDisplayLength": 10,
+         "order": [[ 1, "desc" ]]
+          
+        
+    });
+         
+     $(".dataTables_length").eq(0).remove();
+   $(".dataTables_filter").eq(0).remove();
+     
+     });
+
+
+    </script>
+     <!-- Script Static Resource End-->
+
+
+
+<apex:form Id="displayFieldArea" >
+
+<apex:pageMessages ></apex:pageMessages>
+<apex:actionFunction action="{!getHistory}" name="HistoryDetails" status="blockUI"/>
+<apex:actionFunction name="removeDisplayFields" action="{!removeField}" oncomplete="alert('hi');test();" status="blockUI">
+   <apex:param name="FieldName" value="" assignTo="{!sRemoveFieldName}"/>
+</apex:actionFunction>
+<apex:actionFunction name="test" reRender="displayFieldArea" immediate="true" />
+
+<apex:actionFunction name="displayFields" action="{!generateField}" oncomplete="test();" status="blockUI" > <!-- It is used to get fields based on selected partner type -->
+   <apex:param name="FieldName" value="" assignTo="{!sFieldName}"/>
+
+</apex:actionFunction>
+
+<apex:actionStatus startText="Loading..." stopText=""></apex:actionStatus>
+<apex:actionStatus onstart="blockPage()" onstop="unblockPage()" id="blockUI"/>  
+
+<apex:pageblock mode="maindetail"  >
+  <!-- Below link is used to toggle between read only and edit mode of page --->
+  <apex:pageblockButtons location="top">
+   <apex:commandLink action="{!changePageMode}" rendered="{!bIsOutputPage}" >Modify Partner Profile</apex:commandLink>
+   <apex:commandButton value="Save" action="{!save}" rendered="{!NOT(bIsOutputPage)}" reRender="displayFieldArea"  status="blockUI"  oncomplete="HistoryDetails()" />
+    <apex:commandButton value="Cancel" onclick="cancel()" rendered="{!NOT(bIsOutputPage)}"  />
+  </apex:pageblockButtons>
+  
+   <apex:pageBlockSection title="Partner type Information">             <!-- Partner Type Information list per Partner type record -->
+    <!--Below Section is used to show Partner type checkboxes and they are checked based on user selected previously --->
+     <apex:repeat value="{!lstAllPartnerType}" var="picklistVar">
+      <apex:inputCheckbox value="{!mapFieldCheckbox[picklistVar]}"   label="{!picklistVar}" onchange="showField('{!picklistVar}',this.name)"  disabled="{!bIsOutputPage}"/>
+      
+      </apex:repeat>
+  
+   </apex:pageBlockSection>
+  <!-- Below section shows related fields based on user selected partner type ---> 
+ <apex:actionRegion id="displayFieldArea1">
+ 
+  <apex:repeat value="{!mapCheckboxFieldset}" var="partnerType" >
+    <!--   <apex:pageBlockSection title="{!IF(CONTAINS(partnerType,'Advocate'),'Advocate',IF(CONTAINS(partnerType,'Artist'),'Artist',IF(CONTAINS(partnerType,'Speaker'),'Speaker',IF(CONTAINS(partnerType,'Blogger'),'Blogger',''))))} Information" columns="2">-->
+       <apex:pageBlockSection title="{!SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(partnerType,'_',' '),' Section',''),'x','/')} Information"> <!-- Name of Section header -->
+         
+            <apex:repeat value="{!mapCheckboxFieldset[partnerType]}" var="fieldVar">
+          
+            <!-- Below field toogles based on read only or edit mode of page based on Account fields  --->
+             <apex:inputField value="{!account[fieldVar]}" rendered="{!NOT(bIsOutputPage)}"/>
+              <apex:outputField value="{!account[fieldVar]}" rendered="{!bIsOutputPage}"/>
+          
+         
+          </apex:repeat>
+            
+         <apex:repeat value="{!mapCheckboxFieldsetPartnerType[partnerType]}" var="fieldVar">
+         
+             <!-- Below field toogles based on read only or edit mode of page based on Partner type fields  --->
+             <apex:inputField value="{!mapPartnerTypeData[partnerType][fieldVar]}" rendered="{!NOT(bIsOutputPage)}"/>
+              <apex:outputField value="{!mapPartnerTypeData[partnerType][fieldVar]}"  rendered="{!bIsOutputPage}"/>
+          
+          </apex:repeat>
+        
+       
+       </apex:pageBlockSection>
+ </apex:repeat>
+ 
+ <!-- Partner Type History Details.It shows history of partner type records. -->
+   <apex:pageBlockSection title="History Details" rendered="{!AND(bIsOutputPage,NOT(ISNULL(lstHistoryWrapperFinal)))}" columns="1">
+   
+         <apex:pageBlockTable value="{!lstHistoryWrapperFinal}" var="historyVar" id="historyTable">
+         
+                <Apex:column value="{!historyVar.sPartnerType}" headerValue="Partner Type" />             <!-- Partner Type  -->
+                <Apex:column value="{!historyVar.sModifiedDate}" headerValue="Date" />                    <!-- Modified Date  -->
+                
+                 <Apex:column headerValue="User">
+                   <apex:outputLink value="{!historyVar.oChangedBy.Id}">{!historyVar.oChangedBy.Name}</apex:outputLink>    <!-- Change by Id  -->
+                 </apex:column>
+                  <Apex:column headerValue="Action">
+                     <apex:outputText value="{!historyVar.sChangeHistory}" escape="false"></apex:outputText>     <!-- Action Link  -->
+                  
+                  </apex:column>
+         
+         </apex:pageBlockTable>
+    
+    </apex:pageBlockSection>
+</apex:actionRegion>  
+  
+
+</apex:pageBlock>
+
+</apex:form>
+  
+</apex:page>

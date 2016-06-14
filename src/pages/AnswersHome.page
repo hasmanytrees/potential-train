@@ -1,0 +1,2 @@
+<apex:page action="{!URLFOR('/answers/answersHome.apexp')}"/>
+<!--   page taking to URL for  answersHome page         -->

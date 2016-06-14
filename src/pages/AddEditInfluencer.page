@@ -1,0 +1,205 @@
+<apex:page controller="AddEditInfluencerController" sidebar="false" tabStyle="Event_Room__c">
+
+<!-- Static resource-->
+<apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <apex:stylesheet value="{!URLFOR($Resource.jQuery2, 'css/ui-lightness/jquery-ui-1.8.16.custom.css')}"/> 
+ <!-- Static resource ends-->
+     
+     
+     <!--Script Block--->
+   <script> 
+       
+     $j = jQuery.noConflict(); 
+   
+     function validationCheck(){
+     var i=0;
+      $j("input.abc34[type='text']").each(function(){
+     // alert("hii"+ ($j(this).val())+"bye");
+      if($j(this).val()==''){
+        $j(this).parent("span").children('input').css('border','2px solid #C36241');
+        $j(this).parent("span").parent("div").append("<div style='color:#C36241'><b> Error: </b> You must enter a value</div>");
+        i++;
+        
+      //  alert("insider"+i+$j(this).val());
+             }
+     
+     
+      });
+     if(i==0){
+    // alert("inside"+i);
+     saveMeth();
+     }
+     else
+     {
+         unblockPage();
+     }
+     }
+     
+     
+     
+     //function to block the whole page  during action status
+     function blockPage(){   
+   //  alert("hii");
+       $j.blockUI({ message: '<img src="/img/loading32.gif" /><h1> Loading...</h1>',   
+         css: {   
+          border: 'none',   
+          padding: '15px',   
+          '-webkit-border-radius': '10px',   
+          '-moz-border-radius': '10px',   
+          opacity: .9  
+         }   
+       });  
+     //  alert("hii2"); 
+       return false;  
+     }  
+     //function to unblock the page  
+     function unblockPage(){  
+       $j.unblockUI();  
+     }  
+
+       
+        function ConfirmDelete()
+        {
+            var x = confirm("Are you sure?");
+            if (x)
+                deleteRow();
+            else
+                return false;
+        }
+        
+         
+    </script>
+    <!--Script Block Ends -->
+    
+    
+    
+    <apex:form id="formId">
+    <apex:outputPanel id="scriptPanel">
+    <script>
+        function refreshPageFunc()
+        {
+            if("{!bIsSaved}" == "false")
+            {
+                unblockPage();
+            }
+            else
+            {
+                refreshPage();
+            }
+        }
+    </script>    
+    </apex:outputPanel>
+    <apex:actionFunction name="deleteRow" action="{!deleteInfluencer}" reRender="formId" immediate="true" /> 
+    <apex:actionFunction name="ErrorLog" onComplete="unblockPage()" rerender="thePanel2,msg" /> 
+    <apex:actionStatus onstart="blockPage();" onstop="unblockPage()" id="blockUI"/>  
+    
+     <!-- Page Block to show list of Influencer records for an Event Location -->
+        <apex:pageBlock id="InfluencerList">
+            <apex:outputLabel > <font size="3"><b> Influencer List</b></font></apex:outputLabel> 
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          
+      
+      <apex:commandButton action="{!GoBacktoEventLocation}" immediate="true"  value="Back"/>     
+          <apex:outputPanel id="message" > 
+            <apex:pageMessage summary="There are no influencers related to this event. Please add new influencer by clicking on the Add/Edit Influencer button."
+                    severity="info" strength="3" rendered="{!!if(lstInfluencerWrapperFinal.size != 0 ,true,false)}" />
+            <apex:pageMessages />
+            
+             <apex:actionFunction name="refreshPage" action="{!refreshPage}" reRender="formId" rendered="{!bIsSaved}" oncomplete="unblockPage();" /> 
+         </apex:outputPanel> 
+            <apex:outputPanel layout="block" style="border:5px; width: 100%; overflow: auto; color:#ffffff" rendered="{!if(lstInfluencerWrapperFinal.size != 0 ,true,false)}">      
+          
+                  <!-- Below block is to display already added influencer -->
+                    <apex:pageBlockTable id="influencerTableId" style="table-layout: fixed;" columnsWidth="15%,15%,15%,15%,15%,15%,10%" width="50%" rendered="{!if(lstInfluencerWrapperFinal.size != 0 ,true,false)}" value="{!lstInfluencerWrapperFinal}" var="Influence" >
+                     <!--  <apex:column headerValue="Delete">
+                       <apex:commandLink Onclick="return ConfirmDelete();"  action="{!deleteInfluencer}"  style="color:#015BA7"><apex:param name="dID" value="{!Influence.id}"/>Delete</apex:commandLink>        
+                        </apex:column>  -->           
+                        <apex:column value="{!Influence.oInfluencerReference.Influencer__c}"/>  <!-- Influencer Lookup and name  -->
+                        <apex:column value="{!Influence.oInfluencerReference.Influencer_Id__c}"/> <!-- Influencer ID  -->
+                        <apex:column value="{!Influence.oInfluencerReference.Partner_Type__c}"/>
+                        <apex:column value="{!Influence.oInfluencerReference.Credit__c}"/>    <!-- Shanu- Changes made for COR0001493  -->
+                         <!--<apex:column value="{!Influence.oInfluencerReference.of_Influence__c}"/>    <!-- Influencer % of influence  -->
+                        <apex:column value="{!Influence.oInfluencerReference.Source_Code__c}"/>  <!-- Shanu- Changes made for COR0001516 Source Code Lookup -->
+                        <apex:column value="{!Influence.oInfluencerReference.Presentation_Start_Time__c}"/>
+                         <apex:column value="{!Influence.oInfluencerReference.Travel_Start_date__c}"/>
+                         <apex:column value="{!Influence.oInfluencerReference.Travel_End_Date__c}"/>
+                    </apex:pageBlockTable>        
+           </apex:outputPanel>  
+            
+            <apex:pageblockSection >               
+                <apex:pageblockSectionItem >                
+                    <apex:commandButton value="Add/Edit Influencer" rerender="formId" status="blockUI" action="{!AddEditInfluencer}"  immediate="true" /> 
+                </apex:pageblockSectionItem>
+            </apex:pageblockSection>                    
+        </apex:pageBlock>
+        <!-- Page Block ends -->
+        
+        
+    <!-- Page Block to show list of Influencer records all in editable form -->
+    <apex:actionFunction name="saveMeth" action="{!saveInfluencerTable}" reRender="thePanel2,message,scriptPanel" oncomplete="refreshPageFunc();"/>
+     <apex:actionRegion >
+         <apex:pageBlock id="thePanel2" title="Add/Edit Influencer Records" rendered="{!bInfluencerTableEditRecordsRender}" > 
+         <apex:variable value="{!0}" var="rowNum"/>  
+        
+              <center>            
+                    <apex:commandButton value="Save" rerender="thePanel2,message,scriptPanel" onClick="blockPage()" onComplete="validationCheck()" /> 
+                  <apex:commandButton value="Cancel" rerender="formId" status="blockUI" immediate="true" action="{!refreshPage}" />
+              </center>    
+           <apex:actionRegion >
+                   <!-- Below page block creates a section in edit mode to add/edit influencer record -->
+               <apex:pageBlockTable id="influencerTableId"   value="{!lstInfluencerWrapper}" var="i" >
+                      
+                      <!-- Below column to delete exsisting influencer row from page  -->
+                      <apex:column headerValue="Delete" >
+                        
+                        <apex:commandLink immediate="{!if(i.oInfluencerReference.Influencer__c <> null,false,true)}" action="{!deleteInfluencer}" rerender="thePanel2,msg"  status="blockUI" style="color:#015BA7" value="Delete" >
+                        <apex:param name="rowToRemove" value="{!i.iIndex }" assignTo="{!iRowToRemove}"/></apex:commandLink>  
+                         
+                       </apex:column>                        
+                         <apex:column headerValue="Influencer">
+                            <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                            <apex:inputField value="{!i.oInfluencerReference.Influencer__c}" styleClass="abc34"/></div> <!-- Influencer Lookup and name  -->
+                        </apex:column>
+                         <!-- Shanu- Changes made for COR0001493 -->
+                      <!--   <apex:column headerValue="% of Influence">
+                            <apex:inputField required="true" value="{!i.oInfluencerReference.of_Influence__c}"/> <!-- Influencer % of influence  -->
+                      <!--  </apex:column>-->
+                        <apex:column headerValue="Credit">
+                            <apex:inputField value="{!i.oInfluencerReference.Credit__c}"/> <!-- Credit  -->
+                        </apex:column>
+                        <!-- End of Changes made for COR0001493   -->
+                         <apex:column headerValue="Partner Type">
+                            <apex:inputField value="{!i.oInfluencerReference.Partner_Type__c}" /> 
+                        </apex:column>
+                        <!-- Shanu- Changes made for COR0001516  -->
+                          <apex:column headerValue="Source Code">
+                            <apex:inputField value="{!i.oInfluencerReference.Source_Code__c}"/> <!-- Source Code Lookup and name  -->
+                        </apex:column>
+                        <!-- End of Changes made for COR0001516   -->
+                         <apex:column headerValue="Presentation Start Time">
+                            <apex:inputField value="{!i.oInfluencerReference.Presentation_Start_Time__c}"/> 
+                        </apex:column>
+                         <apex:column headerValue="Travel Start date">
+                            <apex:inputField value="{!i.oInfluencerReference.Travel_Start_date__c}"/> 
+                        </apex:column>
+                         <apex:column headerValue="Travel End date">
+                            <apex:inputField value="{!i.oInfluencerReference.Travel_End_Date__c}"/> 
+                        </apex:column>                         
+                            
+                    </apex:pageBlockTable>   
+              </apex:actionRegion>
+               <apex:pageblockSection >               
+                <apex:pageblockSectionItem >                
+                    <apex:commandButton value="Add new Influencer" rerender="thePanel2" status="blockUI" action="{!AddNewInfluencer}"  /> <!-- Add new row to insert influencer page -->
+                </apex:pageblockSectionItem>           
+            </apex:pageblockSection>        
+            </apex:pageBlock>
+              <!-- Page Block ends -->
+             </apex:actionRegion>  
+    </apex:form>
+</apex:page>

@@ -1,0 +1,55 @@
+<apex:page controller="OpportunitySummaryDashboardController" sidebar="false" showHeader="false">
+
+<!-- Script, Static Resources for page start-->
+<script src="{!$Resource.jQueryLibrary}"></script>
+ <script type="text/javascript" language="javascript" src="{!$Resource.DataTablesLibrary}"></script>
+        <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+        <link rel="stylesheet"  href="{!$Resource.jQueryThemeLibrary}"></link>
+
+<!-- below script block to load jQuery data table plugin --->
+    <script>
+      $(document).ready(function(){
+         //alert("hii");
+              $("[Id$='TaskTable']").dataTable({
+           //"bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "sPageLast":"last",
+             "iDisplayLength": 10,
+             "order": [[ 1, "desc" ]]
+              
+            
+        });
+             
+         $(".dataTables_length").eq(0).remove();
+       $(".dataTables_filter").eq(0).remove();
+         
+         });
+    
+    
+    </script>
+<!-- Script, Static Resources for page end-->
+ 
+   <apex:form >
+   <!-- show opportunity list records-->
+     <apex:pageBlock title="Opportunity Summary By Stage">
+     <!-- Below section shows Opportunity amount with stage --->
+       <apex:pageMessages rendered="{!NOT(bShowTable)}"></apex:pageMessages>
+       <apex:pageBlockTable value="{!lstOppWrapper}" var="opportunityVar" id="TaskTable" rendered="{!bShowTable}">
+       
+           <apex:Column headerValue="Stage Name" value="{!opportunityVar.sGroupName}"/>             <!-- opportunity stage Name-->
+           <apex:Column headerValue="No Of Opportunity" value="{!opportunityVar.iRecordCount}"/>    <!-- number of opportunity -->
+             <apex:Column headerValue="Total Revenue" value="{!opportunityVar.dbTotalSum}"/>         <!-- opportunity total Revenue-->
+       
+       
+       </apex:pageBlockTable>
+       <br/><br/>
+   </apex:pageBlock>
+   
+   
+   
+   </apex:form>
+   
+   
+</apex:page>

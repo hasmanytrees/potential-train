@@ -1,0 +1,166 @@
+<apex:page controller="MetadataUtility.importDataFromCSVController" sidebar="false" showHeader="false">
+
+
+ <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+      
+      <apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__Vaporizer_Stylesheet)}"/>
+      
+
+<script type="text/javascript" language="javascript"
+    src="https://cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+<script class="jsbin"
+    src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script><apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__tableJquery,'tableJQUERY/demo_Page.css')}" />
+<apex:stylesheet value="{!URLFOR($Resource.MetadataUtility__tableJquery,'tableJQUERY/table.css')}" />
+<link rel="stylesheet"
+    href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"></link>
+      
+     <style>
+     
+     
+
+    #maincont #menu_settings{
+    display:block;
+    }
+
+     
+     </style>
+        
+    </head>
+    
+    <body> 
+    <apex:form >
+  
+   </apex:form>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+        <div class="navbar-header">          
+             <a class="navbar-brand" href="/apex/MainMenu"><span id="V-Logo">M</span>etadata <span id="V-Logo">U</span>tility </a>
+        </div>
+        
+        <div class="navbar-collapse collapse">
+          <apex:form styleclass="navbar-form navbar-right">
+          <!--<form class="navbar-form navbar-right" role="form">-->
+            <div class="form-group">          
+            </div>
+            <div class="form-group">             
+            </div>
+                          
+            <button type="submit" class="btn btn-warning" data-toggle="modal" data-target="#startRunPopUp" onclick="return false;" id="btn_runs">Start Run</button>
+            <!--<apex:commandButton styleclass="btn btn-warning"  onclick="return false;" value="Start Run" id="btn_runs"/>-->
+          <!--</form>-->
+        </apex:form>  
+        </div><!--/.navbar-collapse -->
+        
+      </div>
+    </div>    
+   <div class="container-fluid" style="float: left;">
+    <img src="{!$Resource.Metadata_Utility_Logo}" style="width:220px; margin-top:20px;"/>    
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar" style="width: 250px;">
+          <ul class="nav nav-sidebar">
+            <li ><a href="https://{!serverUrl}/setup/forcecomHomepage.apexp?setupid=ForceCom">Back to Setup</a></li>
+            <li ><a href="/apex/MainMenu">Home</a></li>
+            <li  ><a href="/apex/setting" id="menu_settings">Settings</a></li>
+            <li><a href="/apex/xmlBrowser" id="menu_objects">XML Browser</a></li>
+             <li class="active" ><a href="/apex/CreateMetaData" id="menu_settings">Modify Metadata Component</a></li>
+            
+            <li ><a href="/apex/MultiselectExample" id="menu_mappings">Object Page Layout Mappings</a></li>
+            <li ><a href="/apex/MultiselectExample2" id="menu_runs">Record Type Picklist Mapping</a></li>
+            <li><a href="/apex/ObjectExtraction" id="menu_mappings">Object Field Extraction</a></li>
+            <li><a href="/apex/WorkflowExtraction" id="menu_mappings">Activate/Deactivate Workflow</a></li>
+            <li><a href="#">Help</a></li>
+           
+          </ul>
+         </div>
+       </div>
+    </div> 
+          
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" style="margin: 0px; ">
+       
+        <h1 class="page-header">Add/Remove MetaData Component</h1>
+        <div class="row placeholders" />  
+        
+               
+        <div id="maincont">
+   
+
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-load.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-deflate.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MetadataUtility__jszip, '/jszip-inflate.js')}"/>  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <apex:form >
+        <apex:pagemessages />
+        <apex:pageBlock >
+        <apex:pageBlockSection columns="3">
+        
+        <apex:selectList value="{!selectedObject}" size="1" label="Choose Object">
+        
+          <apex:selectOptions value="{!allObject}"></apex:selectOptions>
+        
+        </apex:selectList>
+        
+        <br/>
+      &nbsp; <apex:outputLink value="{!URLFOR($Resource.MetadataUtility__SampleFiles,'/SampleFile/FieldCreationTemplate.csv')}"><apex:image value="/img/func_icons/util/help16.png"/> &nbsp;Field Creation Template</apex:outputLink>
+        
+     </apex:pageBlockSection>   
+        
+        
+        
+        
+        <br/><br/><br/>
+             
+           
+             <apex:outputLabel value=" Choose file to input " style="font-weight:bold"></apex:outputLabel>
+                  <apex:inputFile value="{!csvFileBody}"  filename="{!csvAsString}" title="Choose file to input"/>
+            
+         
+             <apex:pageBlockButtons location="bottom" > 
+                   <apex:commandButton value="Upload File & Preview" action="{!preview}" />
+                  <apex:commandButton value="Insert Metadata" action="{!importCSVFile}"/>
+               </apex:pageBlockButtons> 
+           
+        </apex:pageBlock>
+        <apex:pageBlock >
+         <apex:pageblocktable value="{!row}" var="j" id="tab">
+              <apex:column value="{!j.apiName}" ><apex:facet name="header">API Name</apex:facet></apex:column>
+              <apex:column value="{!j.label}" ><apex:facet name="header">Label</apex:facet></apex:column>
+              <apex:column value="{!j.Type}" ><apex:facet name="header">Type</apex:facet></apex:column>
+              <apex:column value="{!j.value1}" ><apex:facet name="header">Value</apex:facet></apex:column>
+              <apex:column value="{!j.length }" ><apex:facet name="header">Length</apex:facet></apex:column>
+        </apex:pageblocktable>
+     </apex:pageBlock>
+   </apex:form>
+   
+        </div>    
+        
+    </div>
+     </body>
+</apex:page>

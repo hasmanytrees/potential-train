@@ -1,0 +1,56 @@
+<apex:page extensions="SurveySummaryByIndividualController" standardController="SurveyTaker__c" sidebar="false" showChat="false" tabStyle="SurveyTaker__c">
+  
+  
+  <apex:form >
+       <!-- Below section shows the Survey Participant's details -->
+        <apex:pageBlock title="Survey Analysis  " >
+        
+          <apex:pageBlockSection columns="1" title="Volunteer Details" >
+          <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Volunteer Name" for="volunterrName"></apex:outputLabel>
+                 <apex:outputLink id="volunterrName" value="/{!sVolunteerId}">{!sVolunteerName}</apex:outputLink>
+          </apex:pageBlockSectionItem>
+          
+             <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Survey Sent to " ></apex:outputLabel>
+                 <apex:outputText value="{!sSurveyEmail}"/>
+          </apex:pageBlockSectionItem>
+          
+          <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Event Location " ></apex:outputLabel>
+                 <apex:outputLink value="/{!sEventLocId}">{!sEventLocName}</apex:outputLink>
+          </apex:pageBlockSectionItem>
+          
+          
+          </apex:pageBlockSection>
+        
+        <!-- Below section is used to show Survey Question and answer for participant -->
+        
+             <Apex:pageBlockSection columns="1" title="Survey Response Analysis by Question" collapsible="false">
+             
+             
+                  <apex:repeat value="{!mapQuestionOrder}" var="questionOderVar">
+                     <!-- this loop is used to show questions -->
+                      <apex:outputLabel value="{!questionOderVar}.{!mapQuestionOrder[questionOderVar]}" style="font-size:15px;margin-left:75px;color:#4a4a56"></apex:outputLabel>
+                      
+                       <apex:repeat value="{!mapQuestionRelatedAnswer[mapQuestionOrder[questionOderVar]]}" var="answerVar" >
+                      
+                          <!-- This loop is used to show  Answer related to any question -->
+                             <apex:inputCheckbox label="{!answerVar}" selected="{!mapQuestionRelatedUserAnswer[mapQuestionOrder[questionOderVar]][answerVar]}" disabled="true" rendered="{!IF(mapQuestionType[mapQuestionOrder[questionOderVar]]=='Free Text',false,true)}"></apex:inputCheckbox>
+                         <!-- based on user input checkbox is set as selected -->
+                       
+                       </apex:repeat>
+                         <!--Below line works for only free text field -->
+                        <apex:outputText escape="false" value="{!mapFreeTextFieldAnswer[mapQuestionOrder[questionOderVar]]}" style="font-size:91%;margin-left:190px;font-weight:bold" rendered="{!IF(mapQuestionType[mapQuestionOrder[questionOderVar]]=='Free Text',true,false)}" ></apex:outputText>
+                 
+                  </apex:repeat>
+               
+          
+             </apex:pageBlockSection>
+      
+        </apex:pageBlock>
+  
+
+  </apex:form>
+  
+</apex:page>

@@ -1,0 +1,109 @@
+<apex:page controller="SurveyAnalysisDashBoardController" tabStyle="Survey__c" sidebar="false" showChat="false" >
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<apex:form >
+
+
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+ <apex:pageBlock >
+ <apex:pageMessages ></apex:pageMessages>
+ 
+ <!-- Below Section shows Number of survey Participent,No of prson responded  -->
+ <apex:pageBlockSection title="Survey Details" columns="1">
+         <apex:pageBlockSectionItem >
+             <apex:outputLabel value="Event Location"></apex:outputLabel>
+             <apex:outputLink value="/{!oCampaign.Id}">{!oCampaign.Name}</apex:outputLink>
+         </apex:pageBlockSectionItem>
+         
+         <apex:pageBlockSectionItem >
+             <apex:outputLabel value="No of Volunteer Responded"></apex:outputLabel>
+             <apex:outputText value="{!iNoOfPersonResponded}"/>
+         </apex:pageBlockSectionItem>
+         
+         <apex:pageBlockSectionItem >
+             <apex:outputLabel value="No of Survey Request Sent "></apex:outputLabel>
+             <apex:outputText value="{!iNoOfPersonSent}"/>
+         </apex:pageBlockSectionItem>
+ 
+ </apex:pageBlockSection>
+ 
+ <!-- this block shows survey analysis per question per answer in pie chart -->
+   <apex:pageBlockSection columns="2" title="Survey Analysis per Question" collapsible="false" rendered="{!bShow}">
+   <apex:repeat value="{!lstPieWedgeData}" var="piChartVar" >   
+   
+   <div  style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto" class="test" id="{!piChartVar.iOrder}">hiii</div>
+  
+    </apex:repeat>
+ </apex:pageBlockSection>
+
+  <apex:repeat value="{!lstPieWedgeData}" var="piChartVar" >      
+
+            <script>
+            var j=0;
+             
+               //It uses jQuery plugin to process survey analysis and form pie chart.
+               $(function () {
+            //alert( $("[id='"+{!piChartVar.iOrder}+"']").html());
+                $(document).ready(function () {
+                 
+                    // Build the chart
+                    $("[id='"+{!piChartVar.iOrder}+"']").highcharts({
+                  
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            height:300
+                        },
+                          credits: {
+                            enabled: false
+                          },
+                        title: {
+                            text: "{!piChartVar.iOrder+1}.{!piChartVar.sQuestion}"
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                showInLegend: true
+                            }
+                        },
+                        series: [{
+                            type: 'pie',
+                            name: 'Browser share',
+                            data: [
+                           
+                             <apex:repeat value="{!piChartVar.lstData}" var="piChartVar2"  >
+                            
+                                ['{!piChartVar2.sNameVal}',   {!piChartVar2.iDataVal}],
+                                
+                              </apex:repeat>
+                          
+                               
+                            ]
+                        }]
+                    });
+                });
+            
+              });
+             </script>
+     </apex:repeat>
+   </apex:pageBlock>
+  
+
+
+  </apex:form>
+
+    
+    
+    
+    
+</apex:page>

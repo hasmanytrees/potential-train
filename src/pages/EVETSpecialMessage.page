@@ -1,0 +1,489 @@
+<apex:page controller="EVETSpecialMessageController" sidebar="false" showChat="false" showHeader="false" >
+
+    <!-- Style sheet from static resource has been used which provides suitable styling to the Page just like the way other pages of EVET section appears -->
+    <apex:stylesheet value="{!URLFOR($Resource.EventStylesheet)}"/>  
+    
+    <!-- CSS Style Block Starts here for providing suitable color combination during various script events -->
+    <style>
+
+         .selectedLink{
+            color:white;
+            background-color:#969696;
+            padding-left:7px;
+             padding-bottom:5px;
+         
+         
+         
+         
+         }
+         .selectedLink2{
+            color:white;
+            pointer-events: pointer;   
+         
+         
+         
+         }
+        .selectedLink3{
+            
+            pointer-events: none;   
+         
+         
+         
+         }
+    </style>
+    <!-- CSS Style block ends here -->
+        
+    <apex:form id="form">    
+        
+        <!-- Stylesheets addition started -->
+        <script src="{!$Resource.AjaxLibrary}"></script>
+        
+        <!-- Latest compiled and minified JavaScript -->
+            <script src="{!$Resource.BootStrapLibrary}"></script>
+        <!-- Latest compiled and minified CSS -->
+            <link rel="stylesheet" href="{!$Resource.BootStrapCSSLibrary}" />
+           
+            
+           
+          <apex:stylesheet value="{!URLFOR($Resource.EVET_Stylesheet)}"/>
+          <script type="text/javascript" language="javascript" src="{!$Resource.DataTablesLibrary}"></script>
+        <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+        <link rel="stylesheet"  href="{!$Resource.jQueryThemeLibrary}"></link>
+        
+        <!-- Stylesheets addition ends-->
+        
+      <apex:outputPanel layout="block" id="scriptBlock"> 
+      
+      <!-- Inline jQuery Script block starts here -->        
+        <script>
+            
+            
+            $j = jQuery.noConflict(); 
+           $j(document).ready(function(){
+           
+             
+              
+              $j("[id$='message']").on('keyup', function() {
+                UpdateCharactersLeft(this);
+            });
+           
+            $j("#ckbCheckAll").click(function () {
+            //alert("hii"); 
+            $j(".checkBoxClass").prop('checked', $j(this).prop('checked'));
+        });
+           oTable =  $j("[id$='AccountdataTable']").dataTable({
+           //"bJQueryUI": true,
+             "bPaginate": false,
+            "sPaginationType": "full_numbers",
+            "sPageLast":"last",
+            "bInfo":false,
+             "iDisplayLength": 10000
+              
+            
+        });
+         $j(".dataTables_length").eq(0).remove();
+       $j(".dataTables_filter").eq(0).remove();
+       //UpdateCharactersLeft($j("[id$='message']"));
+      
+       
+       $j("[id$='message']").attr("maxlength","1000");
+       
+           });
+           
+           
+           function UpdateCharactersLeft(element) {
+        var max = 1000;
+        //alert("hiii");
+        var len = $j(element).val().length;
+        
+        if (len >= max) {
+            $j('#countStatus').text(' you have reached the limit');
+        } 
+        else {
+         
+            var ch = max - len;
+            $j('#countStatus').text('Text Limited to 1000 character : '+len+' used ');
+        }
+    }
+
+          
+          
+        function getAdvocates(zipcode){
+         //alert(zipcode);
+         getAdvocateDetails(zipcode);
+        
+        
+        }
+
+      
+     
+      
+      </script>
+      
+      <!-- Inline Script block ends here -->
+     </apex:outputPanel> 
+       
+      <apex:actionStatus id="blockUI" stopText="">
+        <apex:facet name="start">
+            <div>
+                <div class="popupBackground" />
+                <div class="PopupPanel">
+                    <table border="0" width="100%" height="100%">
+                        <tr>
+                            <td align="center"><b>Please Wait</b></td>
+                        </tr>
+                        <tr>
+                            <td align="center"><img src="/img/loading32.gif"/></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </apex:facet>
+    </apex:actionStatus>
+      <!-- Action status block starts which is used for showing the popup image for Waiting Symbol -->   
+          <apex:actionStatus id="blockUIPoll" rendered="{!bIsContionueBatch}" >
+            <apex:facet name="start">
+                <div>
+                    <div class="popupBackground2" />
+                    <div class="PopupPanel2">
+                        <table border="0" width="100%" height="100%">
+                            <tr>
+                                <td align="center"><b>Please Wait</b></td>
+                            </tr>
+                            <tr>
+                                <td align="center"><img src="/img/loading32.gif"/></td>
+                            </tr>
+                             <tr><br/>
+                                <td align="center">Sending Email : {!iTotalSize} of {!iTotalEmailCount}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop">
+                <div>
+                    <div class="popupBackground2" />
+                    <div class="PopupPanel2">
+                        <table border="0" width="100%" height="100%">
+                            <tr>
+                                <td align="center"><b>Please Wait</b></td>
+                            </tr>
+                            <tr>
+                                <td align="center"><img src="/img/loading32.gif"/></td>
+                            </tr>
+                             <tr><br/>
+                                <td align="center">Sending Email : {!iTotalSize} of {!iTotalEmailCount}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </apex:facet>
+        </apex:actionStatus>   
+        <!-- Action Status Block Ends Here -->  
+       
+
+       
+       
+       <apex:actionFunction name="getAdvocateDetails" action="{!getNearByPinCodeList}" reRender="form" status="blockUI">
+       
+         <apex:param assignTo="{!sZIPCode}" value="" name="zipcode"/>   
+       </apex:actionFunction>
+       
+       
+      <!-- Div panel for the page which divides page into several components starts here -->
+       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #807f7f!important;width:100%">
+         &nbsp;&nbsp;&nbsp;   <div class="dropdown btn-group" style="margin-top:15px;">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="background:#468c35;color:white;padding:5px 5px;border-radius:5px;">
+                Start a New Email
+                <span class="caret"></span>
+            </a>
+             <ul class="dropdown-menu">
+                <li><a href="/apex/EVETAdvocateAppealEmail" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span> Advocate Appeal Email</a></li>
+                <li><a href="/apex/EVETEventDetailsEmail" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span>Event Details Email</a></li>
+                <li><a href="/apex/EVETThankYouEmail" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span>Thank You Email</a></li>
+                <li><a href="/apex/EVETSpecialMessage" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span>Special Message Email</a></li>
+            </ul>
+        </div>
+             <div class="navbar-header" style="float:right !important;"> 
+              <a class="navbar-brand" href="/apex/EVETHomepage" style="color:#333131 !important;font-size:25px;" >Event Volunteer Email Tool </a>
+                
+            
+      </div>
+     </div> 
+     <!-- div Panel ends here -->
+     
+     <apex:outputPanel layout="block" styleClass="headerBox" >
+     
+      <br/>
+     
+     <!-- This Panel grid is used for providing the Special Message Information which will appear on the mail send to the volunteer --> 
+     <apex:panelGrid columns="2"  style="width:100%">
+       <apex:outputPanel >
+       <h2>Special Message</h2><br/>
+          <p><h5>Send a special message about an event by creating a list of contacts and then typing the message in text box provided.Create a list of contacts by using search below.This message below might be to inform people
+                               of a special cancellation with special details,inform people of a venue change for a location, or other similar circumstances related to your event.</h5></p>
+       <br/><br/>
+       </apex:outputPanel>
+       
+       <apex:outputPanel layout="block" styleClass="boxTitleFour" style="width:700px;max-width:700px:min-width:700px;" rendered="{!bIsSystemAdmin}">
+       <h5>Volunteer Coordinator(This is only for debugging purpose and will be removed)</h5><br/>
+        <apex:panelGrid columns="3">
+           
+          <div class="form-group">
+        <apex:inputField value="{!campaignOwner.Published_Volunteer_Coordinator_Name__c}"/>
+      <apex:commandButton action="{!init}" value="Submit" styleClass="btn btn-default" reRender="form" status="blockUI"/>
+      
+      </div>
+     </apex:panelGrid>
+     <!-- The Panel grid section ends here -->
+       </apex:outputPanel>
+     
+     </apex:panelGrid>
+     
+     </apex:outputPanel>
+
+
+      <apex:outputPanel layout="block"  style="padding-left:5px;"  >
+      
+         
+        <apex:panelGrid columns="2" style="width:100%"> 
+        
+        
+        <apex:outputPanel layout="block" rendered="{!bShowSecondPage}"  >
+        
+         <apex:outputPanel layout="block" style=" background:#f2f2f2 url('/img/alohaSkin/bPageBlock_gradient.png') repeat-x;overflow:scroll;height:300px;width:200px">
+          <Apex:commandButton value="Start Over" action="{!init}" reRender="form" StyleClass="btn btn-default" status="blockUI"/>
+        </apex:outputPanel>
+        
+        </apex:outputPanel>
+        
+        
+        
+        
+         <!-- This Output Panel is used for provding the Search Advocate search by parameters which is displayed in tabular format -->
+         <apex:outputPanel layout="block" rendered="{!NOT(bShowSecondPage)}">
+     
+            <br/><apex:outputLabel value="Search Advocate" style="font-size:25px;min-width:540px;margin-top:-30px;"></apex:outputLabel>  
+          
+          <ul id="myTab" class="nav nav-tabs" >
+       <li class="active">
+          <a href="#home" data-toggle="tab">
+             Event Slots
+          </a>
+       </li>
+       <li ><a  href="#eventArea" data-toggle="tab">Event Area</a></li>
+       <li><a href="#zip" data-toggle="tab">Zip</a></li>
+       <li ><a href="#email"  data-toggle="tab">Custom Email Address </a></li>
+    </ul>
+      <div id="myTabContent" class="tab-content" style="padding-left:10px;border:1px solid #ddd;">
+       <div class="tab-pane fade in active" id="home" ><br/>
+        
+     
+     
+       <apex:outputPanel layout="block" style=" background:#f2f2f2 url('/img/alohaSkin/bPageBlock_gradient.png') repeat-x;overflow:scroll;height:300px;" >
+       
+        <apex:outputLabel value="No events found" rendered="{!bIsNoRecord}"></apex:outputLabel>
+        
+        <!-- This repeat is used for dispalying the available list of volunteers which are retrieved based on the search parameters selected initially by the user -->
+         <apex:repeat value="{!lstAllActiveCampaign}" var="campaignVar">
+         
+         <apex:outputPanel >
+           <apex:outputPanel layout="block"  styleClass="{!IF((sSelectedEvent==campaignVar.Id),'selectedLink','')}">
+           <!--styleClass="{!IF(AND((bIsNew),(sSelectedEvent==campaignVar.Id)),'selectedLink2','selectedLink3')}" -->
+            <apex:commandLink id="events" action="{!showVolunteers}" status="blockUI" styleClass="{!IF((sSelectedEvent==campaignVar.Id),'selectedLink2','')}"  reRender="scriptBlock,outputBlock"><br/><b> {!campaignVar.Published_Location_Name__c}</b><br/>{!campaignVar.VEN_Name__c},{!IF(NOT(ISBLANK(campaignVar.Address_1__c)),campaignVar.Address_1__c+',','')}{!IF(campaignVar.Address_2__c!=null,campaignVar.Address_2__c+',','')}{!IF(campaignVar.Address_3__c!=null,campaignVar.Address_3__c+',','')}<br/>{!IF(campaignVar.City__c!=null,campaignVar.City__c+',','')}{!IF(campaignVar.State__c!=null,campaignVar.State__c+',','')}{!campaignVar.ZIP_Code__c},{!campaignVar.Country__c}<br/>
+           <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+               <apex:param value="{!campaignVar.StartDate}" /> 
+           </apex:outputText> {!campaignVar.EVE_Start_Time__c} -  
+           <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+               <apex:param value="{!campaignVar.EndDate}" /> 
+           </apex:outputText> {!campaignVar.EVE_End_Time__c}
+           <apex:param name="zip code" value="{!campaignVar.ZIP_Code__c}" assignTo="{!sZIPCode}"/>
+           <apex:param name="campaignId" value="{!campaignVar.Id}" assignTo="{!sSelectedEvent}"/>
+           </apex:commandLink>
+             
+            
+           
+           </apex:outputPanel>
+         
+         
+          </apex:outputPanel><div style="padding-top:3px;"/>
+         </apex:repeat><br/>
+       </apex:outputPanel>
+       
+       
+       <br/><br/>
+    </div>   
+      
+      
+      <div class="tab-pane" id="eventArea" ><br/>
+          
+        <apex:outputLabel value="Event Area" style="font-weight:normal"></apex:outputLabel><br/>
+                <apex:selectList value="{!sSelectedEvent}" size="1">
+          
+            <apex:selectOptions value="{!lstAllCampaign}"></apex:selectOptions>
+          </apex:selectList><br/><br/>
+       
+        <apex:outputLabel value="Search Radius" style="font-weight:normal"></apex:outputLabel><br/>
+          <apex:selectList value="{!sSelectedDistanceByEvent}" size="1">
+          
+            <apex:selectOptions value="{!lstAllDistance}"></apex:selectOptions>
+          </apex:selectList>
+       
+     <br/><br/>
+     <apex:commandButton StyleClass="btn btn-default" value="Search" action="{!getNearByPinCodeListByEvent}" reRender="scriptBlock,outputBlock" status="blockUI"/>
+      <br/><br/><br/><br/><br/><br/><br/><br/><br/> <br/>
+     </div>
+      
+      
+      
+      
+      
+      
+       <div class="tab-pane" id="zip" ><br/>
+          
+        <apex:outputLabel value="Zip Code" style="font-weight:normal"></apex:outputLabel><br/>
+           <apex:inputText value="{!sZIPCode}" size="5" style="width:60px;"/><br/><br/>
+       
+        <apex:outputLabel value="Search Radius" style="font-weight:normal"></apex:outputLabel><br/>
+          <apex:selectList value="{!sSelectedDistance}" size="1">
+          
+            <apex:selectOptions value="{!lstAllDistance}"></apex:selectOptions>
+          </apex:selectList>
+       
+     <br/><br/>
+     <apex:commandButton StyleClass="btn btn-default" value="Search" action="{!getNearByPinCodeList}" reRender="scriptBlock,outputBlock" status="blockUI"/>
+      <br/><br/><br/> <br/><br/><br/> <br/><br/><br/><br/> 
+     </div>
+     
+     
+     
+     
+     
+     
+     
+        <div class="tab-pane" id="email" ><br/>
+          
+     <h6> Enter Multiple Email Addresses here,one Per line (Max 50) </h6><br/><br/>
+     
+     <apex:inputTextarea value="{!sEmailIds}" style="width:450px;height:200px"/>
+       
+     <br/><br/>
+     <apex:commandButton StyleClass="btn btn-default" value="Verify" action="{!getAccountByEmails}" reRender="scriptBlock,outputBlock" status="blockUI"/>
+      <br/><br/><br/> <br/>
+     </div>
+     
+     
+     
+      </div>
+
+       </apex:outputPanel>
+     
+     
+      
+        
+         
+         
+         
+        <apex:outputPanel layout="block" styleclass="OutputTable"  id="outputBlock" style="width:97%">
+        <apex:pageMessages ></apex:pageMessages>
+         <apex:outputPanel style="padding-top:45px;" rendered="{!bShowAdvocates}" >
+          <h3>Contact List</h3><br/>
+          <p><h5>{!iNoOfAdvocate} people found based on criteria</h5><br/>
+          </p>
+            <apex:commandButton StyleClass="btn-custom" action="{!hideSearchResult}" style="float:right" value="{!IF(bIsHidden==false,'Hide Recipients ','Show Recipients ')}" reRender="outputBlock,scriptBlock" status="blockUI"/>
+              <apex:commandButton StyleClass="btn-custom-Danger" action="{!init}"  value="X  Clear Search Value" reRender="form" status="blockUI" rendered="{!bIsHidden}"/>
+     
+      <apex:outputPanel rendered="{!NOT(bIsHidden)}">
+       <br/><br/>
+     </apex:outputPanel>  
+       <apex:pageBlock mode="mainDetail">
+       <!-- This page block table is sued for displaying the list of accounts with their communication details available in salesforce -->
+         <apex:pageBlockTable value="{!lstAccountWrapper}" var="accountVar"  id="AccountdataTable" rendered="{!NOT(bIsHidden)}">
+           <apex:column >
+             <apex:facet name="header"><input type="checkbox" id="ckbCheckAll"/></apex:facet>
+             <apex:inputCheckbox value="{!accountVar.bIsSelected}" styleClass="checkBoxClass"/>
+           
+           </apex:column>
+         
+         <apex:column headerValue="Name">
+           <apex:outputLink value="/{!accountVar.account.Id}">{!accountVar.account.Account_Full_Name__c}</apex:outputLink>
+         </apex:column>
+         <apex:column value="{!accountVar.account.Preferred_Email_Address__c}" headerValue="Email"/>   
+         <apex:column value="{!accountVar.account.Preferred_Phone_No__c}" headerValue="Phone"/>   
+         
+         
+         
+         
+        </apex:pageBlockTable>
+        <apex:outputPanel rendered="{!NOT(bIsHidden)}">
+        <br/><br/>
+       </apex:outputPanel>
+        <apex:commandButton StyleClass="btn-custom-Danger" action="{!init}"  value="X  Clear Search Value" reRender="form" status="blockUI" rendered="{!Not(bIsHidden)}"/>
+       
+      </apex:pageBlock>
+        <apex:outputPanel layout="block" styleClass="boxTitleFour" style="width:95%;margin-top:50px;margin-left:-15px;position:relative;">
+         <div style="margin-bottom:25px;" >
+        
+      
+      <apex:commandButton StyleClass="btn-custom" action="{!gotoSecondPage}" style="float:right" value="Next" reRender="form" status="blockUI"/>
+      </div>
+      </apex:outputPanel>   
+     </apex:outputPanel>  
+     
+     <!-- This section just provides an info to the user for confirming the number of selected individuals by the User and to verify and ensure desired number of volunteers are selected -->
+     <apex:outputPanel layout="block" style="margin-left:30px;min-width:1030px;" rendered="{!AND(bShowSecondPage,NOT(bSuccess))}">
+      <div class="page-header">
+                <div class="container">
+                    <div class="row-fluid">
+                      <h3>Event Results</h3>
+                    </div>
+                </div>
+            </div>
+         <apex:outputPanel layout="block" rendered="{!NOT(bSuccess)}">
+         <h5> This email will be sent to {!iNoOfSelectedAdvocate} people found in your criteria.<br/>This will be the body of the email message. A greeting and a signature will be included automatically.</h5></apex:outputPanel>
+         <br/><br/>
+         <apex:pageBlock mode="mainDetail" rendered="{!NOT(bSuccess)}">
+                   <apex:pageBlockTable value="{!lstCampaignWrapper}" var="campaignVar">
+                     <apex:column headerValue="Select" >
+                        <apex:inputCheckbox value="{!campaignVar.bIsSelected}"/>
+                     
+                     </apex:column>
+                     <apex:column headerValue="Event Location">
+                        <apex:outputLink value="/{!campaignVar.campaign.Id}">{!campaignVar.campaign.Published_Location_Name__c}</apex:outputLink>
+                     
+                     </apex:column>
+                    <apex:column value="{!campaignVar.sStartDate}" headerValue="Start Date"/>
+                     <apex:column value="{!campaignVar.sEndDate}" headerValue="End Date"/>
+                     <apex:column value="{!campaignVar.campaign.City__c}" headerValue="City"/>
+                     <apex:column value="{!campaignVar.campaign.State__c}" headerValue="State"/>
+                     <apex:column value="{!campaignVar.campaign.ZIP_Code__c}" headerValue="Postal Code"/>
+                   
+                   
+                   </apex:pageBlockTable>
+             </apex:pageBlock>
+          <Apex:inputTextArea value="{!sSpecialNote}" style="width:900px;height:300px;"  id="message"/><br/><br/>
+          <div id="countStatus"><script> $j("#countStatus").text("Text Limited to 1000 character : "+$j("[id$='message']").val().length+" used ");</script></div>
+          
+          <apex:outputPanel layout="block" styleClass="boxTitleFour" style="width:200px;margin-left:-19px;" >
+             
+             <!-- This command button appears at the bottom of the page which is clicked for sending the email to the selected volunteers -->
+              <apex:commandButton StyleClass="btn-custom" value="Send Email" action="{!getEmailBatch}" reRender="form" status="blockUI"/>
+              
+              
+        </apex:outputPanel> 
+     </apex:outputPanel>
+     
+     
+     
+     </apex:outputPanel>
+     
+        
+       </apex:panelGrid> 
+      </apex:outputPanel>
+     
+        <apex:actionPoller action="{!getEmailBatch}" interval="5" reRender="form" rendered="{!bIsContionueBatch}" status="blockUIPoll"/>
+      </apex:form>    
+     
+</apex:page>

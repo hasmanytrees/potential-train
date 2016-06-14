@@ -1,0 +1,84 @@
+<apex:page sidebar="false" showHeader="false" showChat="false">
+  
+     <!-- Script Static Resource Start-->
+    <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-1.6.2.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jQuery2, 'js/jquery-ui-1.8.16.custom.min.js')}"/>  
+   <apex:includeScript value="{!URLFOR($Resource.jqPlugin, '/jquery.blockUI.js')}"/>  
+   <script>
+      function openDownloadPage(){
+      
+    
+      var urlVar=$(location).attr('href');
+      var contentId;
+      var secondPart=urlVar.split("?");
+      var urlPart=secondPart[1];
+      var paramVal=urlPart.split("&");
+      for(var i=0;i<paramVal.length;i++){
+      
+         var firstPart=paramVal[i].split("=")[0];
+           var secondPart=paramVal[i].split("=")[1];
+         if(firstPart=="contentId"){
+            contentId=secondPart;
+            break; 
+          }
+      
+      }
+     
+        
+       var selectedStatus=$('#selectorId option:selected').val();
+        if((contentId!=null)&&(contentId!=""))
+       window.open('/apex/FileDownloader?contentId='+contentId+'&type='+selectedStatus,'_blank');
+       else
+        alert("No SBC Communication Found !!.");
+      }
+      function cancelBtn(){
+           var urlVar=$(location).attr('href');
+      var contentId;
+      var secondPart=urlVar.split("?");
+      var urlPart=secondPart[1];
+      var paramVal=urlPart.split("&");
+      for(var i=0;i<paramVal.length;i++){
+      
+         var firstPart=paramVal[i].split("=")[0];
+           var secondPart=paramVal[i].split("=")[1];
+         if(firstPart=="contentId"){
+            contentId=secondPart;
+            contentId=contentId.split("%")[0];
+            break; 
+          }
+      
+      }
+     
+        
+     
+           if((contentId!=null)&&(contentId!=""))
+       window.top.location='/'+contentId;
+       else
+        alert("No SBC Communication Found !!.");
+      
+      }
+   
+   </script>
+  <apex:form >
+  
+      <apex:pageBlock >
+      <apex:pageBlockSection >
+            <apex:pageBlockSectionItem >
+        <apex:outputLabel title="Choose Letter Type"  style="font-weight:bold;font-size:100%;color:#4a4a56;margin-left:134px" >Choose Letter Type</apex:outputLabel>
+           <select id="selectorId">
+              <Option value="Original">Original Letter Image</Option>
+                 <Option value="Final">Final Letter Image</Option>
+           </select>
+       </apex:pageBlockSectionItem>
+     </apex:pageBlockSection>
+      <apex:pageBlockButtons location="bottom">
+         <input type="button" clas="btn" onClick="openDownloadPage();" value="Download"/>
+        <input type="button" clas="btn" onClick="cancelBtn();" value="Cancel"/>
+      </apex:pageBlockButtons>
+      </apex:pageBlock>
+  
+  </apex:form>
+  
+  
+  
+</apex:page>

@@ -1,0 +1,178 @@
+<apex:page controller="CalendarViewController" action="{!pageLoad}" sidebar="false" showChat="false" id="page" readOnly="true">
+  
+  <!-- Script and Style sheet for Calender view -->
+    <link href="{!$Resource.fullCalendarCSS}" rel="stylesheet" />
+    <link href="{!$Resource.fullCalendarPrintCSS}" rel="stylesheet" media="print" />     
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="{!$Resource.fullCalendarMinJS}"></script>
+    <apex:form id="form">   
+       
+        <script>
+            //We need to wrap everything in a doc.ready function so that the code fires after the DOM is loaded
+            $(document).ready(function() {   
+                //Call the fullCallendar method. You can replace the '#calendar' with the ID of the dom element where you want the calendar to go. 
+                $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,agendaWeek,agendaDay'
+                    },
+                    editable: false,
+                    aspectRatio: 3,
+                    events:
+                    [
+                        //At run time, this APEX Repeat will reneder the array elements for the events array
+                        <apex:repeat value="{!lstEvents }" var="e">
+                            {
+                                title: '{!e.sTitle}',
+                                start: '{!e.sStartString }',
+                                end: '{!e.sEndString }',
+                                url: '{!e.sUrl }',
+                                allDay: {!e.bAllDay },
+                                className: '{!e.sClassName }'
+                            },
+                        </apex:repeat>
+                    ]
+                });
+                 
+            });     
+        </script>
+         
+        <!--some styling. Modify this to fit your needs-->
+        <style>
+            #cal-options {float:left;}
+            .cal-legend { float:right;}
+            .cal-legend ul {margin:0;padding:0;list-style:none;}
+            .cal-legend ul li {margin:0;padding:5px;float:left;}
+            .cal-legend ul li span {display:block; height:16px; width:16px; margin-right:4px; float:left; border-radius:4px;}
+            .cal-legend2 { float:right;}
+            .cal-legend2 ul {margin:0;padding:0;list-style:none;}
+            .cal-legend2 ul li {margin:0;padding:5px;float:left;}
+            .cal-legend2 ul li span {display:block; height:16px; width:16px; margin-right:4px; float:left; border-radius:4px;}
+            .cal-legend3 { float:right;}
+            .cal-legend3 ul {margin:0;padding:0;list-style:none;}
+            .cal-legend3 ul li {margin:0;padding:5px;float:left;}
+            .cal-legend3 ul li span {display:block; height:16px; width:16px; margin-right:4px; float:left; border-radius:4px;}
+            #calendar {margin-top:20px;}
+            #calendar a:hover {color:#fff !important;}
+             
+            .fc-event-inner {padding:3px;}
+            .event-deliverable {background:#6FDEC2;border-color:#6FDEC2;}
+            .event-campaign {background:#cc9933;border-color:#cc9933;}
+            .event-event {background:#1797c0;border-color:#1797c0;}
+            .event-eventlocation {background:#D08F8F;border-color:#D08F8F;}
+            .event-meeting{background:#D08F8F;border-color:#D08F8F;}
+            
+            .statusStyle {
+                background:url(/img/loading.gif) no-repeat 0 0; 
+                padding-left:20px; 
+                margin-left:10px; 
+                padding-bottom:5px; 
+                font-weight:bold;
+            }
+        </style>
+       
+        <apex:sectionHeader title="{!sSelectedFilter} Calendar"/>
+        <apex:actionFunction name="showOtherSection" action="{!showHideFilter}" rerender="form" status="Stat"/>  
+        <!-- filter block for varous scenario -->
+        <apex:pageBlock mode="mainDetail" rendered="{!bShowFilter}" id="pgblck1"> 
+            <apex:pageBlockButtons location="bottom">      
+                <apex:commandButton action="{!applyFilter}" value="Apply Filter" reRender="form" status="Stat" />
+                <apex:commandButton action="{!reset}" value="Reset Filter" reRender="form" status="Stat" />
+                <apex:actionStatus startText="Loading..." stopText="" id="Stat" startStyleClass="statusStyle"/>
+            </apex:pageBlockButtons>      
+            
+            <apex:outputPanel id="calPanel">
+                <apex:pageBlockSection rendered="{!bShowBasicFilter}"  title="Filter Criteria " collapsible="false">
+                    <apex:selectList value="{!sSelectedFilter}" label="Filter By Type" size="1" onchange="showOtherSection()">
+                        <apex:selectOptions value="{!lstFilter}" ></Apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSection>
+                <!-- Filter for Campiagn  -->
+                <apex:pageBlockSection id="pgblcksection1"> 
+                <!-- Varous filter fields for Campiagn -->        
+                    <apex:pageBlockSection id="campaign" title="Campaign Filter" collapsible="false" rendered="{!bShowCampaign}" columns="5">
+                        <apex:selectList value="{!sSelectedFilter}" label="Filter By Type" size="1" onchange="showOtherSection()">
+                            <apex:selectOptions value="{!lstFilter}" ></Apex:selectOptions>
+                        </apex:selectList>
+                        <apex:inputfield value="{!oCampaignFilter.Launch_Date__c}" />
+                        <!--<apex:input type="date" label="Launch Date" value="{!testDate}"/>-->
+                        <apex:inputField value="{!oCampaignFilter.EndDate}"/>
+                        <apex:inputField value="{!oCampaignFilter.Type}"/>
+                        <apex:inputField value="{!oCampaignFilter.Date_Of_Submission__c}" label="Created Date"/>
+                    </apex:pageBlockSection>
+                    <!-- Filter for Event -->
+                    <apex:pageBlockSection id="event" title="Event Filter" collapsible="false" rendered="{!bShowEvent}" columns="5">
+                     <!-- Varous filter fields for Ecent Location-->  
+                        <apex:selectList value="{!sSelectedFilter}" label="Filter By Type" size="1" onchange="showOtherSection()">
+                            <apex:selectOptions value="{!lstFilter}" ></Apex:selectOptions>
+                        </apex:selectList>    
+                        <apex:inputField value="{!oEventFilter.StartDate}"/>
+                        <apex:inputField value="{!oEventFilter.EndDate}"/>
+                        <apex:inputField value="{!oEventFilter.Type}"/>
+                        <apex:inputField value="{!oEventFilter.EVE_Channel__c}"/>
+                    </apex:pageBlockSection>
+                    <!-- Filter for Event Location-->
+                    <apex:pageBlockSection id="eventLocation" title="Event Location Filter" collapsible="false" rendered="{!bShowEventLocation}" columns="5">
+                     <!-- Varous filter fields for Event Location-->
+                        <apex:selectList value="{!sSelectedFilter}" label="Filter By Type" size="1" onchange="showOtherSection()" style="overflow:none;">
+                            <apex:selectOptions value="{!lstFilter}" ></Apex:selectOptions>
+                        </apex:selectList>         
+                        <apex:inputField value="{!oEventLocationFilter.StartDate}"/>
+                        <apex:inputField value="{!oEventLocationFilter.EndDate}"/>
+                        <apex:inputText value="{!sVenueState}" label="State"/>          
+                    </apex:pageBlockSection>
+                    <!-- Filter for Deliverable  -->
+                    <apex:pageBlockSection id="deliverable" title="Deliverable Filter" collapsible="false" rendered="{!bShowDeliverable}" columns="2">
+                    <!-- Varous filter fields for Deliverable -->
+                        <apex:selectList value="{!sSelectedFilter}" label="Filter By Type" size="1" onchange="showOtherSection()">
+                            <apex:selectOptions value="{!lstFilter}" ></Apex:selectOptions>
+                        </apex:selectList>
+                       
+                       
+                        <apex:inputField value="{!oDeliverableFilter.Drop_Date__c}"/>
+                     
+                    </apex:pageBlockSection>
+                   <apex:outputPanel layout="block" style="margin-top:15px;">
+                       <c:MultiselectPicklist leftLabel="Available Deliverable Type"
+                            leftOptions="{!lstUnselectedSelectOption}"
+                            rightLabel="Selected Deliverable Type"
+                            rightOptions="{!lstSelectedSelectOption}"
+                            size="5"
+                            width="150px" rendered="{!bShowDeliverable}"/> 
+                     </apex:outputPanel>  
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>       
+        <!-- Below block is used to show calender Grid view based on filter selected -->
+        <apex:pageBlock mode="mainDetail" id="pgblck2">
+           <!--Below block show legend for Campaign and Deliverable -->
+            <apex:outputPanel layout="block" StyleClass="cal-legend" rendered="{!bShowCampaignGrid}">
+                <ul>
+                    <li><apex:outputPanel Styleclass="event-deliverable" />Delivarable</li>
+                    <li><apex:outputPanel Styleclass="event-campaign"/>Campaigns</li>
+                </ul>
+                <div style="clear:both;"><!--fix floats--></div>
+            </apex:outputPanel>
+              <!--Below block show legend for Event and Event Location -->    
+            <apex:outputPanel layout="block" StyleClass="cal-legend2" rendered="{!bShowEventGrid}">
+                <ul>
+                    <li><apex:outputPanel Styleclass="event-event"/>Event</li>
+                    <li><apex:outputPanel Styleclass="event-eventlocation"/>Event Location</li>
+                </ul>
+                <div style="clear:both;"><!--fix floats--></div>
+            </apex:outputPanel>
+              <!--Below block show legend for showing Meeting -->      
+            <apex:outputPanel layout="block" styleClass="cal-legend3" rendered="{!bShowMeetingGrid}">
+                <ul>
+                    <li><apex:outputPanel Styleclass="event-meeting"/>Meeting</li>
+                </ul>
+                <div style="clear:both;"><!--fix floats--></div>
+            </apex:outputPanel>
+                
+            <div style="clear:both;"><!--fix floats--></div>
+            <div id="calendar"></div>
+        </apex:pageBlock>      
+    </apex:form>   
+</apex:page>

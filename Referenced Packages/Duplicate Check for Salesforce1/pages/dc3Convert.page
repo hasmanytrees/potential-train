@@ -1,0 +1,494 @@
+<apex:page docType="html-5.0" standardcontroller="Lead" extensions="dupcheck.dc3ControllerConvert" sidebar="false" title="Convert - Duplicate Check for Salesforce" action="{!janitor}" tabstyle="dc3Search__tab">
+
+	<apex:stylesheet value="{!URLFOR($Resource.dupcheck__dc3Assets,'/dc3/assets/css/bootstrap-namespaced.min.css')}" />
+	<apex:stylesheet value="{!URLFOR($Resource.dupcheck__dc3Assets,'/dc3/assets/css/fonts.css')}" />
+	<apex:stylesheet value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/style/bootstrap-select.css" />
+	<apex:stylesheet value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/style/duplicatecheck.css" /> 
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]--> 
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" />
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<apex:includeScript value="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" />
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js" />
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular-sanitize.min.js" />
+	<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap.js" />
+	<apex:includeScript value="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/bootstrap-select.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/bootbox.min.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/duplicatecheck.js" />
+	<apex:includeScript value="{!IF(isDev,AssetsUrl,URLFOR($Resource.dupcheck__dupcheckAssets,'/dupcheckAssets'))}/salesforce1/js/duplicatecheck.convert.js" />
+	
+	<apex:includeScript value="/soap/ajax/35.0/connection.js"/>
+    <script>
+	    sforce.connection.sessionId='{!GETSESSIONID()}';
+    </script>
+
+	<div class="bootstrap-sf1" ng-app="convertApp" data-url-return="{!returnUrl}" data-sf-fetch-default="{!$RemoteAction.dc3ControllerConvert.fetchDefault}" data-stage="{!JSINHTMLENCODE(stage)}" data-paccount-id="{!JSINHTMLENCODE(paccountId)}" data-paccount-name="{!JSINHTMLENCODE(paccountName)}" data-account-id="{!JSINHTMLENCODE(accountId)}" data-account-name="{!JSINHTMLENCODE(accountName)}" data-contact-id="{!JSINHTMLENCODE(contactId)}" data-contact-name="{!JSINHTMLENCODE(contactName)}" data-lead-id="{!JSINHTMLENCODE(leadId)}" data-sf-dc-account="{!$RemoteAction.dc3ControllerConvert.dcAccount}" data-sf-dc-paccount="{!$RemoteAction.dc3ControllerConvert.dcPAccount}" data-sf-dc-contact="{!$RemoteAction.dc3ControllerConvert.dcContact}" data-sf-object-search="{!$RemoteAction.dc3ControllerConvert.objectSearch}" data-sf-account-by-contact="{!$RemoteAction.dc3ControllerConvert.accountByContact}" data-sf-convert="{!$RemoteAction.dc3ControllerConvert.doConvert}" data-sf-related-object="{!$RemoteAction.dc3ControllerConvert.getRelatedTypeAhead}">
+
+		<div class="container-fluid" ng-controller="convertController">
+			<!-- NAV TOP BAR -->
+			<div class="row">
+				<div class="col-xs-12">
+
+					<div class="pull-right tools">
+						<a href="#" onClick="dcNavigate('http://ity.vc/app-convert', '')" class="help">Help <i class="s1utility s1utility-help "></i></a>
+					</div>
+
+				</div>
+			</div>
+			
+			<div class="row" ng-if="{!NOT(license.features.pageConvert)}" >
+				<div class="col-xs-12">
+					<div class="panel">
+						<header class="panel-heading">
+							Not licensed
+						</header>
+						<div class="panel-body">
+							You are not licensed to use Convert feature of Duplicate Check for Salesforce1. Please contact your Salesforce administrator.
+							
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+								<div class="col-xs-12 text-right">
+									<button class="btn btn-success" onclick="dcNavigate('{!$Page.dc3License}','')">Show License</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+
+			<!-- LEAD SECTION -->
+			<div ng-if="{!license.features.pageConvert}"  >
+			<div ng-init="opportunityInfo.taskSubjectList=[{!taskSubject}]; opportunity.opportunityName='{!leadData['Company']} - '; opportunity.userName='{!$User.FirstName} {!$User.LastName}'; opportunity.userId='{!$User.Id}'; opportunity.convertStatus='{!convertStatusDefault}'; opportunity.taskStatus='{!taskStatusDefault}'; opportunity.taskPriority='{!taskPriorityDefault}'" />
+		
+			<div class="row" >
+				<div class="col-xs-12">
+					<div class="panel">
+						<div class="panel-heading">
+
+							<h2 class="panel-title">
+								<i class="s1icon {!JSINHTMLENCODE(leadConfig.icon)}"></i> Convert {!JSINHTMLENCODE(leadConfig.objectLabel)}
+							</h2>
+						</div>
+						<div class="panel-body">
+							<div class="col-xs-12">
+								<apex:repeat value="{!leadConfig.resultField}" var="rf">
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right"> <apex:outputText value="{!rf.fieldLabel}" />
+									</Label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">
+										<c:dc3OutputField oName="{!leadConfig.objectName}" fName="{!rf.fieldName}" oData="{!leadData}" />
+										&nbsp;
+									</div>
+								</apex:repeat>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+								<div ng-if="selectedAccount.length > 0">
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right"> Selected {!JSINHTMLENCODE(accountConfig.objectLabel)} </label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">
+										<span ng-bind-html="selectedAccountName" />
+										<button class="btn btn-xs btn-warning " ng-click="resetAccount()">change</button>
+									</div>
+								</div>
+								<div ng-if="selectedPAccount.length > 0">
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right"> Selected {!JSINHTMLENCODE(paccountConfig.objectLabel)} </label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">
+										<span ng-bind-html="selectedPAccountName" />
+										<button class="btn btn-xs btn-warning " ng-click="resetAccount()">change</button>
+									</div>
+								</div>
+								<div ng-if="selectedContact.length > 0">
+									<Label class="col-xs-12 col-sm-2 text-xs-left text-sm-right"> Selected {!JSINHTMLENCODE(contactConfig.objectLabel)} </label>
+									<div class="col-xs-12 col-sm-4 mg-b-10">
+										<span ng-bind-html="selectedContactName" />
+										<button class="btn btn-xs btn-warning " ng-click="resetContact()">change</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ACCOUNT SELECT SECTION -->
+			<div class="row account-select" ng-if="stage == 'account'">
+				<div class="col-xs-12">
+					<div class="panel">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-12 align-left">
+									<h2 class="panel-title">
+										<i class="s1icon {!JSINHTMLENCODE(accountConfig.icon)}"></i> Select {!JSINHTMLENCODE(accountConfig.objectLabel)}
+									</h2>
+								</div>
+								
+							</div>
+						</div>
+						<div class="panel-body">
+							<div ng-if="accountSearch.status == 'searching'">
+								<i class="s1utility s1utility-spinner s1utility-animate"></i> Searching..
+							</div>
+
+							<div ng-if="accountSearch.status == 'finished' && (!accountList || accountList.length == 0)">No associated {!JSINHTMLENCODE(accountConfig.objectLabel)} found.</div>
+
+							<div ng-if="accountList.length > 0">
+								<div class="table-responsive" ng-show="viewType == 'table'">
+									<table class="view table table-striped table-hover" style="display: table;">
+										<thead>
+											<tr>
+												<th width="40" class="score">Score</th>
+												<apex:repeat value="{!accountConfig.resultField}" var="rf">
+													<th>{!rf.fieldName}</th>
+												</apex:repeat>
+												<th>&nbsp;</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="result in accountList">
+												<td><span ng-bind="result.score" />%</td>
+												<apex:repeat value="{!accountConfig.resultField}" var="rf">
+													<td ng-bind-html="objectList[result.objectData.Id]['{!rf.fieldName}']"></td>
+												</apex:repeat>
+												<td class="text-right">
+													<button class="btn btn-xs merge btn-success" ng-click="selectAccount(result.objectData.Id)">Select</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="row view cards" ng-show="viewType == 'card'"></div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+
+								<div class="col-xs-12 text-right text-xs-left form-inline">
+									<div class="input-group">
+										<input type="text" class="form-control" ng-model="accountSearch.input" ng-enter="accountSearch()" placeholder="search for {!JSINHTMLENCODE(accountConfig.objectLabel)}..." /> 
+											<span class="input-group-btn">
+												<button class="btn btn-default" ng-click="accountSearch()">
+													<i class="s1utility s1utility-search"></i>
+												</button>
+											</span>
+									</div>
+
+									<button class="btn merge btn-success" ng-click="selectAccount('NEW')">New {!JSINHTMLENCODE(accountConfig.objectLabel)}</button>
+									<button type="button" class="btn btn-grey" ng-click="goBack()">Back</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(paccountConfig))}">
+			<!-- PERSON ACCOUNT SELECT SECTION -->
+			<div class="row paccount-select" ng-if="stage == 'contact' || stage == 'account'">
+				<div class="col-xs-12">
+					<div class="panel">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-12 align-left">
+									<h2 class="panel-title">
+										<i class="s1icon {!JSINHTMLENCODE(paccountConfig.icon)}"></i> Select {!JSINHTMLENCODE(paccountConfig.objectLabel)}
+									</h2>
+								</div>
+								
+							</div> 
+						</div>
+						<div class="panel-body">
+							<div ng-if="paccountSearch.status == 'searching'">
+								<i class="s1utility s1utility-spinner s1utility-animate"></i> Searching..
+							</div>
+							<div ng-if="paccountSearch.status == 'finished' && (!paccountList || paccountList.length == 0)">No associated {!JSINHTMLENCODE(paccountConfig.objectLabel)} found.</div>
+
+							<div ng-if="paccountList.length > 0">
+								<div class="table-responsive" ng-show="viewType == 'table'">
+									<table class="view table table-striped table-hover" style="display: table;">
+										<thead>
+											<tr>
+												<th width="40" class="score">Score</th>
+												<apex:repeat value="{!paccountConfig.resultField}" var="rf">
+													<th>{!rf.fieldName}</th>
+												</apex:repeat>
+												<th>&nbsp;</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="result in paccountList">
+												<td><span ng-bind="result.score" />%</td>
+												<apex:repeat value="{!paccountConfig.resultField}" var="rf">
+													<td ng-bind-html="objectList[result.objectData.Id]['{!rf.fieldName}']"></td>
+												</apex:repeat>
+												<td class="text-right">
+													<button class="btn btn-xs merge btn-success" ng-click="selectPaccount(result.objectData.Id)">Select</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="row view cards" ng-show="viewType == 'card'"></div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+								<div class="col-xs-12 text-right text-xs-left form-inline">
+									
+									<div class="input-group">
+										<input type="text" class="form-control" ng-model="paccountSearch.input" ng-enter="paccountSearch()" placeholder="search for {!JSINHTMLENCODE(paccountConfig.objectLabel)}..."/>
+											<span class="input-group-btn">
+												<button class="btn btn-default" ng-click="paccountSearch()">
+													<i class="s1utility s1utility-search"></i>
+												</button>
+											</span>
+									</div>
+								
+									<button class="btn merge btn-success" ng-click="selectPaccount('NEW')">New {!JSINHTMLENCODE(paccountConfig.objectLabel)}</button>
+									<button type="button" class="btn btn-grey" ng-click="goBack()">Back</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			</apex:outputPanel>
+			<!-- CONTACT SELECT SECTION -->
+			<div class="row contact-select" ng-if="stage == 'contact' || stage == 'account'">
+				<div class="col-xs-12">
+					<div class="panel">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-12 align-left">
+									<h2 class="panel-title">
+										<i class="s1icon {!JSINHTMLENCODE(contactConfig.icon)}"></i> Select {!JSINHTMLENCODE(contactConfig.objectLabel)}
+									</h2>
+								</div>
+								
+							</div>
+						</div>
+						<div class="panel-body">
+							<div ng-if="contactSearch.status == 'searching'">
+								<i class="s1utility s1utility-spinner s1utility-animate"></i> Searching..
+							</div>
+							<div ng-if="contactSearch.status == 'finished' && (!contactList || contactList.length == 0)">No associated {!JSINHTMLENCODE(contactConfig.objectLabel)} found.</div>
+
+							<div ng-if="contactList.length > 0">
+								<div class="table-responsive" ng-show="viewType == 'table'">
+									<table class="view table table-striped table-hover" style="display: table;">
+										<thead>
+											<tr>
+												<th width="40" class="score">Score</th>
+												<apex:repeat value="{!contactConfig.resultField}" var="rf">
+													<th>{!rf.fieldName}</th>
+												</apex:repeat>
+												<th>&nbsp;</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="result in contactList">
+												<td><span ng-bind="result.score" />%</td>
+												<apex:repeat value="{!contactConfig.resultField}" var="rf">
+													<td ng-bind-html="objectList[result.objectData.Id]['{!rf.fieldName}']"></td>
+												</apex:repeat>
+												<td class="text-right">
+													<button class="btn btn-xs merge btn-success" ng-click="selectContact(result.objectData.Id)">Select</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="row view cards" ng-show="viewType == 'card'"></div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+								<div class="col-xs-12 text-right text-xs-left form-inline">
+									
+									<div class="input-group">
+										<input type="text" class="form-control" ng-model="contactSearch.input" ng-enter="contactSearch()" placeholder="search for {!JSINHTMLENCODE(contactConfig.objectLabel)}..."/>
+											<span class="input-group-btn">
+												<button class="btn btn-default" ng-click="contactSearch()">
+													<i class="s1utility s1utility-search"></i>
+												</button>
+											</span>
+									</div>
+								
+									<button class="btn merge btn-success" ng-click="selectContact('NEW')">New {!JSINHTMLENCODE(contactConfig.objectLabel)}</button>
+									<button type="button" class="btn btn-grey" ng-click="goBack()">Back</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- OPPORTUNITY SELECT SECTION -->
+			<div class="row contact-select" ng-if="stage == 'opportunity'">
+				<div class="col-xs-12">
+					<div class="panel">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-12 align-left">
+									<h2 class="panel-title">
+										<i class="s1icon {!JSINHTMLENCODE(opportunityMeta.Icon)}"></i> Create {!JSINHTMLENCODE(opportunityMeta.Label)}
+									</h2>
+								</div>
+							</div>
+						</div>
+						<div class="panel-body">
+
+							<form class="form-horizontal">
+								<fieldset>
+									<legend>General</legend>
+									<div class="form-group">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Record Owner</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10">
+											<input class="form-control" typeahead-loading="loadingLocations" typeahead-wait-ms="500" typeahead-min-length="3" ng-model="opportunity.userName" typeahead-on-select="opportunity.userId = $item.id" typeahead="related.name for related in getLookup($viewValue, 'User')" type="text" /> <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+										</div>
+									</div>
+									<div class="form-group">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Send Email to the Owner</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10">
+											<input type="checkbox" ng-model="opportunity.emailOwner" />
+										</div>
+									</div>
+									<div class="form-group">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Conversion Status</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10">
+											<select class="form-control" ng-model="opportunity.convertStatus" ng-options="v.MasterLabel as v.MasterLabel for (k,v) in leadStatus">
+												
+											</select>
+										</div>
+									</div>
+									<div class="form-group">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Override Lead Source</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10">
+											<input type="checkbox" ng-model="opportunity.leadSource" />
+										</div>
+									</div>
+									<legend>Opportunity</legend>
+									<div class="form-group">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Create Opportunity</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10">
+											<input type="checkbox" ng-model="opportunity.createOpp" />
+										</div>
+									</div>
+									<div class="form-group" ng-show="opportunity.createOpp">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Opportunity Name</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10">
+											<input class="form-control" type="text" ng-model="opportunity.opportunityName" />
+										</div>
+									</div>
+									<legend>Task</legend>
+									<div class="form-group">
+										<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Create Task</Label>
+										<div class="col-xs-12 col-sm-8 mg-b-10 text-left">
+											<input type="checkbox" ng-model="opportunity.createTask" />
+										</div>
+									</div>
+									<div ng-show="opportunity.createTask">
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Task Subject</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+												<input class="form-control" typeahead-wait-ms="200" typeahead-loading="loadingTaskSubject" typeahead-min-length="2" ng-model="opportunity.taskSubject" typeahead="task for task in opportunityInfo.taskSubjectList | filter:$viewValue" type="text" /> <i ng-show="loadingTaskSubject" class="glyphicon glyphicon-refresh"></i>
+											</div>
+										</div>
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Status</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+
+												<select class="form-control" selectpicker="selectpicker" ng-model="opportunity.taskStatus">
+													<apex:repeat value="{!taskStatus}" var="stat">
+														<option data-content="{!JSINHTMLENCODE(stat.Label)}" value="{!stat.Value}">{!JSINHTMLENCODE(stat.Label)}</option>
+													</apex:repeat>
+												</select>
+
+											</div>
+										</div>
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Priority</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+												<select class="form-control" selectpicker="selectpicker" ng-model="opportunity.taskPriority">
+													<apex:repeat value="{!taskPriority}" var="stat">
+														<option data-content="{!JSINHTMLENCODE(stat.Label)}" value="{!stat.Value}">{!JSINHTMLENCODE(stat.Label)}</option>
+													</apex:repeat>
+												</select>
+											</div>
+										</div>
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Due Date</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+												<p class="input-group">
+													<input class="form-control" type="text" datepicker-popup="dd-MMMM-yyyy" ng-click="openDueDate($event)" ng-model="opportunityInfo.taskDueDate" is-open="$parent.openedDueDate" /> <span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="openDueDate($event)">
+															<i class="glyphicon glyphicon-calendar"></i>
+														</button>
+													</span>
+												</p>
+											</div>
+										</div>
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Comments</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+												<textarea class="form-control" rows="3" ng-model="opportunity.taskComments"></textarea>
+											</div>
+										</div>
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Send Notification</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+												<input type="checkbox" ng-model="opportunity.taskNotification" />
+											</div>
+										</div>
+										<div class="form-group">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right">Set Reminder</Label>
+											<div class="col-xs-12 col-sm-8 mg-b-10">
+												<input type="checkbox" ng-model="opportunity.taskSetReminder" />
+											</div>
+										</div>
+										<div class="form-group" ng-show="opportunity.taskSetReminder">
+											<Label class="col-xs-12 col-sm-4 text-xs-left text-sm-right vcenter">Reminder</Label>
+											<div class="col-xs-6 col-sm-4 mg-b-10 vcenter">
+												<datetimepicker hour-step="1" minute-step="30" ng-model="opportunityInfo.taskReminder" show-meridian="true" date-format="dd-MMMM-yyyy"></datetimepicker>
+											</div>
+										</div>
+									</div>
+
+								</fieldset>
+
+							</form>
+
+						</div>
+						<div class="panel-footer">
+
+							<div class="row">
+								<div class="col-xs-12 text-right text-xs-left">
+									<button class="btn btn-success convert" ng-click="doConvert()">
+										<span class="no-convert">Convert</span> <span class="convert hidden"><i class="s1utility s1utility-spinner s1utility-animate"></i> One moment please</span>
+									</button>
+									<button type="button" class="btn btn-grey" ng-click="goBack()">Back to record</button>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+
+</apex:page>

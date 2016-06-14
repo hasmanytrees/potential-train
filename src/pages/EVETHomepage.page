@@ -1,0 +1,75 @@
+<apex:page sidebar="false" showChat="false" showHeader="false" >
+
+    <!-- Style sheet from static resource has been used which provides suitable styling to the Page just like the way other pages of EVET section appears -->   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+            <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+            <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+          
+          <apex:stylesheet value="{!URLFOR($Resource.EVET_Stylesheet)}"/>
+          
+          <apex:stylesheet value="{!URLFOR($Resource.EventStylesheet)}"/>   
+         
+            
+  
+  <apex:form > 
+  
+    <!-- This block provides a common platform to the User for selecting any of the EVET scenario based on requriment -->
+    <!-- This allows User to either search for the Advocates or volunteers or sending survey to volunteers or providing event related details etc. -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #807f7f!important">
+     &nbsp;&nbsp;&nbsp;   <div class="dropdown btn-group" style="margin-top:15px;">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="background:#468c35;color:white;padding:5px 5px;border-radius:5px;">
+            Start a New Email
+            <span class="caret"></span>
+        </a>
+         <ul class="dropdown-menu">
+            <li><a href="/apex/EVETAdvocateAppealEmail" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span> Advocate Appeal Email</a></li>
+            <li><a href="/apex/EVETEventDetailsEmail" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span>Event Details Email</a></li>
+            <li><a href="/apex/EVETThankYouEmail" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span>Thank You Email</a></li>
+            <li><a href="/apex/EVETSpecialMessage" ><span style="margin-left:-20px" class="glyphicon glyphicon-envelope">&nbsp;</span>Special Message Email</a></li>
+        </ul>
+        
+        </div>
+             <div class="navbar-header" style="float:right !important;"> 
+              <a class="navbar-brand" href="/apex/EVETHomepage" style="color:#333131 !important;font-size:25px;" >Event Volunteer Email Tool </a>
+                
+            ;
+      </div>
+     </div> 
+
+      <apex:outputPanel layout="block" style="padding-top:100px;padding-left:320px;" >
+        <apex:panelGrid columns="2"> 
+         <apex:outputPanel styleClass="boxTitle" layout="block">
+           <p> Recruit Event Volunteers by  sending an appeal to advocates for your upcoming events.</p>
+          <button type="button" onClick="window.top.location='/apex/EVETAdvocateAppealEmail'" class="btn btn-primary btn-lg active" style="padding:5px 5px;font-size:13px;">Advocate Appeal Email</button>
+         
+         </apex:outputPanel>
+      
+      <apex:outputPanel styleClass="boxTitle" layout="block" >
+           <p> Equip your Event Volunteers by sending an email with all important details.</p>
+          <button type="button" onClick="window.top.location='/apex/EVETEventDetailsEmail'" class="btn btn-primary btn-lg active" style="padding:5px 5px;margin-bottom:500px;font-size:13px;">Event Details Email</button>
+         
+         </apex:outputPanel>
+         
+      <apex:outputPanel styleClass="boxTitle" layout="block" >
+           <p> Encourage your Event Volunteers and encourage them further by sending a Thank You email.</p>
+          <button type="button" onClick="window.top.location='/apex/EVETThankYouEmail'" class="btn btn-primary btn-lg active" style="padding:5px 5px;font-size:13px;">Thank You Email</button>
+         
+         </apex:outputPanel>
+      
+      <apex:outputPanel styleClass="boxTitle" layout="block" >
+           <p> Inform Event Volunteers or Advocates about special details for an event by sending Special Message email. </p>
+          <button type="button" onClick="window.top.location='/apex/EVETSpecialMessage'" class="btn btn-primary btn-lg active" style="padding:5px 5px;font-size:13px;">Special Message Email</button>
+         
+         </apex:outputPanel>
+      
+      
+       </apex:panelGrid> 
+  </apex:outputPanel>
+ 
+ 
+  </apex:form>
+  
+ 
+</apex:page>

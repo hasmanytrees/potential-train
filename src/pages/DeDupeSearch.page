@@ -1,0 +1,23 @@
+<apex:page sidebar="false">
+ <apex:stylesheet value="/sCSS/21.0/sprites/1297816277000/Theme3/default/gc/versioning.css" />   
+<apex:stylesheet value="/sCSS/21.0/sprites/1297816277000/Theme3/default/gc/extended.css" />﻿
+ <apex:form >
+ 
+    <apex:tabPanel id="theTabPanel" selectedTab="Tab1"   styleClass="theTabPanel" tabClass="theTabPanel" contentClass="tabContent" activeTabClass="activeTab" inactiveTabClass="inactiveTab">
+    
+       <apex:tab switchType="client" label=" Account " id="Tab1">
+         <Apex:iframe src="/apex/DeDupeSearchAccount"/>
+       </apex:tab>
+       <apex:tab switchType="client" label=" Lead " id="Tab2">
+         <Apex:iframe src="/apex/DeDupeSearchLead"/>
+       </apex:tab>
+       <apex:tab switchType="client" label=" Contact " id="Tab3">
+         <Apex:iframe src="/apex/DeDupeSearchContact"/>
+       </apex:tab>
+    
+      
+    </apex:tabPanel>
+ 
+ 
+ </apex:form>
+</apex:page>

@@ -1,0 +1,25 @@
+<apex:page controller="R6Service.FollowController">
+    <head>
+        <title>Follow</title>
+    </head>
+    <apex:outputPanel id="messageRenderer">
+        <apex:pageMessages />
+    </apex:outputPanel>
+    
+    <apex:form >
+    <apex:actionFunction name="follow" action="{!follow}" rendered="{!mustFollow}" rerender="closeScript, messageRenderer" oncomplete="closePage();"/>
+    <apex:actionFunction name="unfollow" action="{!unfollow}" rendered="{!!mustFollow}" rerender="closeScript, messageRenderer" oncomplete="closePage();"/>
+    <c:PersonaActionDecorator sender="{!selectedAccount}" persona="{!persona}" onOk="{!IF(mustFollow, 'follow();', 'unfollow();')} return false;" onCancel="self.close();" okButtonText="{!actionVerb} User" actionVerb="{!actionVerb}" />
+    
+    <apex:outputpanel id="closeScript">
+        <script>
+            function closePage()
+            {
+                if({!!hasMessages})
+                    self.close();
+            }
+        </script>
+    </apex:outputpanel>
+    
+  </apex:form>
+</apex:page>

@@ -1,0 +1,98 @@
+<apex:page standardController="Task" extensions="DependentTaskLinksExtension">
+
+    
+    <!-- Style CSS block to provide cursor appearance and no extra spaces -->
+    <style type="text/css">
+        .pbTitle 
+        {
+            white-space: nowrap;
+        }
+
+        a:hover 
+        {
+            cursor:pointer;
+        }
+    </style>
+    <!-- Style CSS block ends here -->
+    
+    <!-- Apex Form starts here -->
+    <apex:form >
+
+        <!-- table for showing dependent child task list which are required to be completed before Completed Parent task -->
+        <apex:pageMessages rendered="{!!bShowTable}"></apex:pageMessages>
+        
+        <!-- Page Block for Dependent Tasks section starts here -->
+        <apex:pageBlock mode="maindetail" title="Dependent Tasks (Below tasks can only be started once this task is completed)" rendered="{!bShowTable}">
+
+            <!-- Below mentioned Page Block Table is used for showing the related child Tasks for the concerned Tasks -->
+            <Apex:pageBlockTable value="{!lstFinalTask}" var="taskVar">
+
+                <Apex:column headerValue="Task Name" >
+                    <a href="" onclick="var win = window.open('/{!taskVar.id}', '_blank');win.focus();" >{!taskVar.Subject}</a>
+                </apex:column>
+
+                <apex:column headerValue="Task Status">
+                    <Apex:outputText value="{!taskVar.Status}"></Apex:outputText>     <!-- Child task Status -->
+                </apex:column>
+
+                <apex:column headerValue="Assigned To">
+                    <Apex:outputText value="{!taskVar.Owner_Name__c}"></Apex:outputText>         <!-- Child task OwnerName -->
+                </apex:column>
+
+                <apex:column headerValue="Due Date Indicator">
+                    <apex:outputText escape="false" value="{!taskVar.Due_Date_Indicator__c}"></apex:outputText>    <!-- Child task due date indicator -->
+                </apex:column>
+
+                <apex:column headerValue="Due Date">
+                    <Apex:outputText value="{!taskVar.ActivityDate}"></Apex:outputText>    <!-- Child task Activity Date -->
+                </apex:column>
+
+            </Apex:pageBlockTable>
+            <!-- Page Block Table for showing related child tasks ends here -->
+            
+        </apex:pageBlock>
+        <!-- Page Block for Dependent Tasks section ends here -->
+        
+        <br/> <!-- Adding Line Break -->
+        
+        <!-- table for showing dependent child task list which are required to be completed before Completed Parent task -->
+        <apex:outputPanel rendered="{!bShowTable}">
+            <apex:pageMessages rendered="{!!bAnotherShowTable}"></apex:pageMessages>
+        </apex:outputPanel>
+        
+        <!-- Page Block for Parent Tasks section starts here -->
+        <apex:pageBlock mode="maindetail" title="Parent Tasks (Below tasks need to be completed for this task to begin)" rendered="{!bAnotherShowTable}">
+        
+            <!-- Below mentioned Page Block Table is used for showing the related Parent Tasks for the concerned Tasks -->
+            <Apex:pageBlockTable value="{!lstFinalParentTask}" var="taskVar">
+
+                <Apex:column headerValue="Task Name" >
+                    <a href="" onclick="var win = window.open('/{!taskVar.id}', '_blank');win.focus();">{!taskVar.Subject}</a>
+                </apex:column>
+
+                <apex:column headerValue="Task Status">
+                    <Apex:outputText value="{!taskVar.Status}"></Apex:outputText>    <!-- Parent task Status -->
+                </apex:column>
+
+                <apex:column headerValue="Assigned To">
+                    <Apex:outputText value="{!taskVar.Owner_Name__c}"></Apex:outputText>        <!-- Parent task OwnerName -->
+                </apex:column>
+
+                <apex:column headerValue="Due Date Indicator">
+                    <apex:outputText escape="false" value="{!taskVar.Due_Date_Indicator__c}"></apex:outputText>    <!-- Parent task due date indicator -->
+                </apex:column>
+
+                <apex:column headerValue="Due Date">
+                    <Apex:outputText value="{!taskVar.ActivityDate}"></Apex:outputText>     <!-- Parent task Activity Date -->
+                </apex:column>
+
+            </Apex:pageBlockTable>
+            <!-- Page Block Table for showing related child tasks ends here -->
+
+        </apex:pageBlock>
+        <!-- Page Block for Parent Tasks section ends here -->
+
+    </apex:form>
+    <!-- Apex Form ends here -->
+
+</apex:page>

@@ -1,0 +1,6 @@
+<apex:page standardController="SurveyTaker__c" >
+     <apex:detail subject="{!SurveyTaker__c.Event_Location__c}" />
+     <script>  
+         alert('You are not allowed to perform this operation.Please contact system administrator ');
+     </script>   
+</apex:page>

@@ -1,0 +1,212 @@
+<apex:page Standardcontroller="Account" extensions="CommunicationPrefExtension" showHeader="{!bAllPage}" showChat="{!bAllPage}" sidebar="{!bAllPage}">
+    <script src="{!$Resource.AjaxLibrary}"></script>   
+  
+        <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+        <link rel="stylesheet"  href="{!$Resource.jQueryThemeLibrary}"></link>
+
+  <apex:form id="form">
+       <script type="text/javascript">
+
+ 
+ $(document).ready(function(){
+   
+   //alert("hiiii");
+  
+   var oTable =  $("[id$='categoryTable']").dataTable({
+     // "bJQueryUI": true,
+            
+                "sPaginationType": "full_numbers",
+                "sPageLast":"last",
+                "bInfo":false,
+                 "iDisplayLength": {!iTableLength}  ,
+                 "bFilter": false,
+                 "bInfo": false ,
+                 "bLengthChange": false       
+        
+    });
+    
+     
+   
+      
+       
+     
+  
+    });
+ 
+  
+  </script>
+  <script>
+  $(document).ready(function(){
+       var oTable2 =  $("[id$='subscriptionTable']").dataTable({
+     // "bJQueryUI": true,
+            
+                "sPaginationType": "full_numbers",
+                "sPageLast":"last",
+                "bInfo":false,
+                 "iDisplayLength": {!iTableLength},
+                 "bFilter": false, 
+                 "bInfo": false,
+                 "bLengthChange": false
+          
+        
+    });
+  
+  });
+  
+  
+  </script>
+      <apex:pageMessages ></apex:pageMessages>
+      <apex:pageBlock title="Communication Preferences" rendered="{!bIsShowPage}">
+      
+        <apex:pageBlockButtons location="top">
+        
+          <input type="button" onclick="window.top.location.href='/apex/CommunicationPrefEditAll?accountId={!accountId}'" value="Edit All" class="btn"/><!--Edit All button -->
+        
+        </apex:pageBlockButtons>
+        
+        <apex:pageBlockSection title="Category" collapsible="true" columns="1">
+        <!-- Below table display various columns -->
+         <apex:pageBlockTable value="{!lstCommPrefWrapperCategory}" var="commVar" id="categoryTable">
+               <!--apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}" headerValue="Action"  >
+              
+               
+                <a  value="Edit" target="_top" href="/apex/CommunicationPrefEdit?accountId={!accountId}&commPrefCSId={!commVar.sCommPrefCSId}&commPrefCSName={!commVar.sCommName}&category=true">Edit</a>
+              </apex:column-->
+               <!-- Column to shoe Active fields -->
+              <!--apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}" headerValue="Active">
+             
+                <apex:facet name="header">Active</apex:facet>
+                <apex:inputCheckbox value="{!commVar.bIsActive}" disabled="true"/>
+              </apex:column-->
+              <apex:column value="{!commVar.sCommName}" rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}" width="36.5%">
+              <!-- Column to shoe Category fields -->
+                <apex:facet name="header">Category</apex:facet>
+                
+              </apex:column>
+             
+              <apex:column value="{!commVar.sMedium}" rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}">
+              
+                <apex:facet name="header">Opt-in Medium</apex:facet>
+                
+              </apex:column>
+              <apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}">
+              
+                <apex:facet name="header">Email Opt Out</apex:facet>
+                <apex:inputCheckbox value="{!commVar.bIsEmailOptOut}" disabled="true"/>
+              </apex:column>
+              <apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}">
+              
+                <apex:facet name="header">Text Opt Out</apex:facet>
+                <apex:inputCheckbox value="{!commVar.bIsTextOptOut}" disabled="true"/>
+              </apex:column>
+              <apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}">
+              
+                <apex:facet name="header">Mail Opt Out</apex:facet>
+                <apex:inputCheckbox value="{!commVar.bIsMailOptOut}" disabled="true"/>
+              </apex:column>
+         
+         
+         
+         </apex:pageBlockTable><br/>
+       </apex:pageBlockSection>
+       
+        <apex:pageBlockSection title="Subscription" collapsible="true" columns="1">
+        <!-- Below table display various columns -->
+         <apex:pageBlockTable value="{!lstCommPrefWrapperSubscription}" var="commVar" id="subscriptionTable">
+               <!--apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}" headerValue="Action" width="7.5%" >
+              
+               
+                <a  value="Edit" target="_top" href="/apex/CommunicationPrefEdit?accountId={!accountId}&commPrefCSId={!commVar.sCommPrefCSId}&commPrefCSName={!commVar.sCommName}&category=true">Edit</a>
+              </apex:column-->
+               <!-- Column to shoe Active fields -->
+              <!--apex:column rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}" headerValue="Active">
+             
+                <apex:facet name="header">Active</apex:facet>
+                <apex:inputCheckbox value="{!commVar.bIsActive}" disabled="true"/>
+              </apex:column-->
+              <apex:column value="{!commVar.sCommName}" rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}" width="36.5%">
+              <!-- Column to shoe Category fields -->
+                <apex:facet name="header">Category</apex:facet>
+                
+              </apex:column>
+              
+              <apex:column value="{!commVar.sMedium}" rendered="{!commVar.sCommName!=$Label.BooleanFieldSection}">
+              
+                <apex:facet name="header">Opt-in Medium</apex:facet>
+                
+              </apex:column>
+             
+         
+         
+         
+         </apex:pageBlockTable><br/>
+       </apex:pageBlockSection>
+       
+       
+       
+       
+       
+       
+       
+         <apex:pageBlock rendered="{!IF(iFullPageSize-iCurrentPageSize<=0,true,false)}">
+       <apex:outputPanel layout="block" rendered="{!bShowBooean==true}" >
+     
+       <table class="list" border="0" cellpadding="0" cellspacing="0">
+        <colgroup span="8"></colgroup>
+         <apex:repeat value="{!lstCommPref}" var="commFieldVar"  >
+         <thead>
+           <tr class="headerRow">
+            <th class="headerRow">
+              <div>Category</div>  
+            </th>
+          <apex:repeat value="{!lstBooleanField}" var="commFieldVar2" >
+         
+            <th class="headerRow">
+                <div>{!SUBSTITUTE(SUBSTITUTE(commFieldVar2,'__c',''),'_',' ')}</div>
+            </th> 
+        
+           </apex:repeat>
+           
+           
+           </tr></thead>
+           <tbody>
+           <tr class="dataRow" >
+           <td class="dataCell">
+            {!$label.BooleanFieldSection}
+              <!--a  value="Edit" target="_top" href="/apex/CommunicationPrefEdit?accountId={!accountId}&commPrefCSId={!booleanCSId}&commPrefCSName={!oCommPrefBooleanCS.Name}">Edit</a-->
+           </td>
+           <apex:repeat value="{!lstBooleanField}" var="commFieldVar2">
+         
+            
+               <td class="dataCell">
+                <apex:outputField value="{!commFieldVar[commFieldVar2]}" />
+             </td>
+        
+           </apex:repeat>
+         </tr>
+          </tbody>
+        </apex:repeat>
+        
+     
+      </table> 
+     </apex:outputPanel>  
+  </apex:pageBlock>   
+         
+         
+         <!-- Page block links to navigate-->
+      <apex:outputPanel layout="block" rendered="{!IF(iFullPageSize-iCurrentPageSize>0,true,false)}" >
+        
+        <apex:commandLink reRender="form" value="Go to list ({!iFullPageSize}) >>" onClick="window.top.location='/apex/CommunicationPref?id={!accountId}&FullPage=TRUE'" rendered="{!IF(iFullPageSize-iCurrentPageSize>0,true,false)}"/>
+      </apex:outputPanel>
+      
+      <br/>
+      </apex:pageBlock>
+  
+  
+  
+  
+  </apex:form>
+  
+</apex:page>

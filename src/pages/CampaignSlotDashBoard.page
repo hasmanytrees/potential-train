@@ -1,0 +1,64 @@
+<apex:page controller="CampaignSlotDashBoardController">
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+<script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+<apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+<apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+<link rel="stylesheet"  href="https://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"></link>
+
+<!-- Script block to load pagination plugin -->
+<script>
+  $(document).ready(function(){
+     //alert("hii");
+          $("[Id$='campaignTable']").dataTable({
+       //"bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "sPageLast":"last",
+         "iDisplayLength": 10,
+         "order": [[ 1, "desc" ]]
+          
+        
+    });
+         
+     $(".dataTables_length").eq(0).remove();
+   $(".dataTables_filter").eq(0).remove();
+     
+     });
+
+
+</script>
+ 
+   <apex:form >
+     <apex:outputPanel layout="block" style="overflow:scroll;">
+        <Apex:pageBlock title="% fulfilled Per Event ">
+             <apex:pageMessages ></apex:pageMessages> 
+            
+             <!-- Tbale to show Event Location with Slot % -->
+              <apex:pageBlockTable value="{!lstCampaignWrapper}" var="campaignVar" id="campaignTable" rendered="{!bShow}" width="100%">
+              
+                  <apex:Column headerValue="Event Name"  style="{!IF(campaignVar.bIsExcceded==false,'background-color:#FF0000','background-color:#00FF00')}">
+                     <a href="/{!campaignVar.oCampaign.Id}" target="_parent">{!campaignVar.oCampaign.Name}</a>
+                 </apex:column>
+                 <!-- Below column cnages CSS based on  if number of slot booked is less than 80% in red else in Green -->
+                  <apex:Column headerValue="Event Status" value="{!campaignVar.oCampaign.Status}"  style="{!IF(campaignVar.bIsExcceded==false,'background-color:#FF0000','background-color:#00FF00')}"/>    <!-- Campaign Status -->
+                  <apex:Column headerValue="Event Start Date"  value="{!campaignVar.oCampaign.StartDate}" style="{!IF(campaignVar.bIsExcceded==false,'background-color:#FF0000','background-color:#00FF00')}"/>   <!-- Campaign Start date -->
+                  <apex:Column headerValue="Event End Date" value="{!campaignVar.oCampaign.EndDate}" style="{!IF(campaignVar.bIsExcceded==false,'background-color:#FF0000','background-color:#00FF00')}"/>        <!-- Campaign end date -->
+                   <apex:Column headerValue="% fulfilled " value="{!campaignVar.oCampaign.Slots_Coverage__c}" style="{!IF(campaignVar.bIsExcceded==false,'background-color:#FF0000','background-color:#00FF00')}"/>             <!-- Campaign Slots Coverage Rate -->
+                  
+              </apex:pageBlockTable>
+        
+          <br/> <br/>
+        
+        </Apex:pageBlock>
+     </apex:outputPanel>
+   
+   
+   
+   </apex:form>
+
+
+
+
+  
+</apex:page>

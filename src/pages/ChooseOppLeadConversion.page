@@ -1,0 +1,59 @@
+<apex:page controller="ChooseOppLeadConversionController" showChat="false" showHeader="false" tabStyle="Lead" sidebar="false">
+   <apex:form id="form">
+  <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+    <apex:includeScript value="/soap/ajax/29.0/apex.js"/>
+    <script src="{!$Resource.AjaxLibrary}"></script>
+           
+  <!-- Style Section to show Loading on Action Status -->
+   <style>
+   .statusStyle {
+    background:url(/img/loading.gif) no-repeat 0 0; 
+    padding-left:20px; 
+    margin-left:10px; 
+    padding-bottom:5px; 
+    font-weight:bold;
+   }
+   .disabled
+        {
+            background: none repeat scroll 0 0 burlyWood;
+            cursor: default !important;
+        }
+    </style>
+    <script type="text/javascript">
+       
+        //alert(__sfdcSessionId );
+       function convertLead(ref,oppChoice){
+        
+        sforce.connection.sessionId = '{!$Api.Session_ID}';
+       ref.disabled=true;
+       $("[id$='buttonId']").append("<div id='messageDiv' class='statusStyle'></div>" );
+        $("[id$='leadConvertBtn']").removeClass('btn');
+       var oppChoiceVar= $("[id$='oppChoice']").is(":checked");
+       
+        
+        var result =  sforce.apex.execute("ChooseOppLeadConversionController","convertLead",{leadId:"{!oLeadVar.Id}",bIsCreateOpportunity:oppChoiceVar});
+      $("[id$='messageDiv']").removeClass("statusStyle" );
+        showResult(result);
+        
+        } 
+    </script>
+  <apex:sectionHeader subTitle="{!oLeadVar.Name}" title="Convert Lead" />
+  <apex:pageMessages escape="false" id="message"></apex:pageMessages>
+     <apex:pageBlock >
+     <apex:actionFunction name="showResult" action="{!showMessage}" reRender="message" status="Stat" id="messageFunc" >
+         <apex:param name="message" assignTo="{!sMessage}" value=""/>
+     </apex:actionFunction>
+     <apex:outputLabel value="Create Opportunity On Lead Conversion ?" style="font-weight:bold;font-size:91%;color:#4a4a56;margin-left:50px"></apex:outputLabel>
+        <apex:inputCheckbox value="{!bCreateOpportunity}" id="oppChoice"  />
+       <apex:pageBlockButtons location="bottom" >
+         <input type="button" class="btn" id="leadConvertBtn" value="Convert Lead" onclick="convertLead(this,{!bCreateOpportunity});"   ></input> <!-- On click ,it converts lead and shows status on vf page -->
+         <input type="button" class="btn" value="Close" onClick="window.top.location='/{!oLeadVar.Id}'" id="buttonId"></input>
+         
+          <apex:actionStatus startText="Loading..." stopText="" id="Stat" startStyleClass="statusStyle"/>
+       </apex:pageBlockButtons>
+     </apex:pageBlock>
+  
+  
+  
+  </apex:form>
+</apex:page>

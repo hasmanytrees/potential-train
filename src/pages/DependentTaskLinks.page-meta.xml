@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>32.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>This is an inline visual force page which is used in the Task detail page.
+This provides two different sections:
+1. Provides all the related child tasks for the concerned Task.
+2. Provides all the Parent Tasks for the concerned Task.</description>
+    <label>DependentTaskLinks</label>
+</ApexPage>

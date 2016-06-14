@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>BillingAddressStatus__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Billing Address Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Not checked</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Not matched</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Parsed but not found</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Ambiguous</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Corrected</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Verified</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackHistory>false</trackHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>BillingCountryLookup__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Billing Country Lookup</label>
+        <referenceTo>CountryObject__c</referenceTo>
+        <relationshipLabel>BillingContracts</relationshipLabel>
+        <relationshipName>BillingContracts</relationshipName>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>BillingStateLookup__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Billing State Lookup</label>
+        <referenceTo>State__c</referenceTo>
+        <relationshipLabel>Contracts</relationshipLabel>
+        <relationshipName>BillingContracts</relationshipName>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>BillingZipCodeLookup__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Billing Zip/Postal Code Lookup</label>
+        <referenceTo>ZipCode__c</referenceTo>
+        <relationshipLabel>Contracts</relationshipLabel>
+        <relationshipName>BillingContracts</relationshipName>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>UtcTimeOffset__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF(AND(MONTH(TODAY()) &gt;=4, MONTH(TODAY()) &lt;=9),
+
+BLANKVALUE(BillingZipCodeLookup__r.TimeZone__r.UtcOffsetMidYear__c, BLANKVALUE(BillingStateLookup__r.TimeZone__r.UtcOffsetMidYear__c, BLANKVALUE(BillingCountryLookup__r.TimeZone__r.UtcOffsetMidYear__c, NULL))), 
+
+BLANKVALUE(BillingZipCodeLookup__r.TimeZone__r.UtcOffset__c, BLANKVALUE(BillingStateLookup__r.TimeZone__r.UtcOffset__c, BLANKVALUE(BillingCountryLookup__r.TimeZone__r.UtcOffset__c, NULL)))
+
+)</formula>
+        <inlineHelpText>Shows current time zone offset according to related Zip code, State and/or Country values.  Note that due to variations in DST start/end dates there may be variances.</inlineHelpText>
+        <label>UTC Time Offset</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+</CustomObject>

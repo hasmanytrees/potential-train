@@ -1,0 +1,214 @@
+<apex:page controller="DeDupeSearchLeadController" tabStyle="Lead" readOnly="true" sidebar="False" showHeader="False" showChat="false">
+  <script src="{!$Resource.AjaxLibrary}"></script>   
+   <script type="text/javascript" language="javascript" src="{!$Resource.Datatable_10_7 }"></script>
+        <script class="jsbin" src="{!URLFOR($Resource.tableJquery,'tableJQUERY/tableJquery2.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/demo_Page.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.tableJquery,'tableJQUERY/table.css')}" />
+        <link rel="stylesheet"  href="{!$Resource.jQueryThemeLibrary}"></link>
+     
+ <apex:form >
+  
+<apex:outputPanel id="scriptBlock2">
+<apex:actionFunction action="{!mergeLead}" name="mergeLeads" rerender="tab,msg,scriptBlock,scriptBlock2" status="blockUI" oncomplete="if('{!bIsRedirect}'=='true'){window.top.location='{!sURL}'}">
+         <apex:param name="SelecetdLeads" assignTo="{!sSelectedLead}" value=""/>
+       
+       </apex:actionFunction>
+ <script>
+ var oTable;
+ $(document).ready(function(){
+   
+   //alert("hiiii");
+     nameCheckBox();
+   oTable =  $("[id$='tab']").dataTable({
+     // "bJQueryUI": true,
+            
+                "sPaginationType": "full_numbers",
+                "sPageLast":"last",
+                "bInfo":false,
+                 "_iDisplayLength": 5
+          
+        
+    });
+    
+   $(".dataTables_length").eq(0).remove();
+    $(".dataTables_filter").eq(0).remove();
+    $(".dataTables_info").eq(1).remove();
+    $(".dataTables_paginate.paging_full_numbers").eq(1).remove();
+  
+    });
+ function getTaggedRec()
+ {
+  
+    //  tableHandler();
+        
+       var sData = $('input:checkbox', oTable.fnGetNodes()).serialize();
+     sData=sData+"&";
+      //alert(sData);
+       var array=sData.split("=on&");
+       //alert(array);
+       var recList;
+       recList='';
+       for(var index=0;index<array.length-1;index++)
+        {
+       
+         recList+=array[index]+',';
+          
+        }
+      //   alert( "The following data would have been submitted to the server: \n\n"+array);
+      // tagRec(recList);
+     //alert(recList);
+      mergeLeads(recList); 
+       
+         
+         }
+    function nameCheckBox(){
+    
+       var i=0;
+   //   alert("hiio");
+    $("[id$='selectCheck']").each(function() {
+  //  alert("hii");
+   $(this).attr('name',  i);
+   i++;
+});
+    
+    
+    
+    }    
+ 
+ </script>
+</apex:outputPanel>
+ <style>
+ 
+    /* This is for the full screen DIV */
+    .popupBackground {
+        /* Background color */
+        background-color:black;
+        opacity: 0.20;
+        filter: alpha(opacity = 20);
+    
+        /* Dimensions */
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 998;
+        position: absolute;
+        
+        /* Mouse */
+        cursor:wait;
+    }
+ 
+    /* This is for the message DIV */
+    .PopupPanel {
+        /* Background color */
+        //border: solid 2px blue;
+        background-color: white;
+ 
+        /* Dimensions */
+        left: 50%;
+        width: 200px;
+        margin-left: -100px;
+        top: 50%;
+        height: 70px;
+        margin-top: -25px;
+        z-index: 999;
+        position: fixed;
+        
+        /* Mouse */
+        cursor:pointer;
+    }
+ 
+ </style>
+       <apex:sectionHeader subtitle="Duplicate Search Lead"/>
+       <apex:pageBlock >
+        <apex:pageMessages id="msg" ></apex:pageMessages>
+         <apex:outputPanel rendered="{!bIsRedirect}" id="scriptBlock">
+         {!bIsRedirect}
+         <script>
+         //alert("hiii");
+          window.top.location="{!sURL}";
+         
+         </script>
+       </apex:outputpanel>
+      
+          <apex:pageBlockSection >
+          
+              <apex:pageBlockSectionItem >
+                <apex:outputLabel value="First Name" for="firstName"></apex:outputLabel>
+                <apex:inputText value="{!sLeadFirstName}" id="firstName"/>
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Last Name" for="lastName"></apex:outputLabel>
+                <apex:inputText value="{!sLeadLastName}" id="lastName"/>
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                 <apex:outputLabel value="Email" for="email"></apex:outputLabel>
+                <apex:inputText value="{!sLeadEmail}" id="email"/>
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Phone" for="phone"></apex:outputLabel>
+                <apex:inputText value="{!sLeadPhone}" id="phone"/>
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Zip Code" for="zip"></apex:outputLabel>
+                <apex:inputText value="{!sLeadAddress}" id="zip"/>
+              </apex:pageBlockSectionItem>
+          
+          
+          </apex:pageBlockSection>
+          <apex:pageBlockButtons location="bottom" >
+             <Apex:commandButton action="{!search}" value="Search" rerender="tab,msg,scriptBlock,scriptBlock2" status="blockUI" />
+             
+              
+              <Apex:commandButton onClick="window.top.location='/001'" value="Cancel"/>
+          </apex:pageBlockButtons>
+           </apex:pageBlock>
+          <apex:pageBlock title="Search Result" >
+          <input type="button" onClick="getTaggedRec()" value="Merge" class="btn"/> 
+       <apex:pageBlockTable value="{!lstLeadWrapper}" var="LeadVar" id="tab">
+            
+            <apex:column headerValue="Select">
+              <apex:inputCheckbox value="{!LeadVar.bIsSelected}" id="selectCheck"/>
+            
+            </apex:column>
+            <apex:column headerValue="Last Name / Group Name" id="NameCol">
+              <a href="/{!LeadVar.oLead.Id}" target="_blank">{!LeadVar.oLead.Company}</a>              
+            </apex:column>
+             <apex:column value="{!LeadVar.oLead.Name}" headerValue="First Name"/>            
+            <apex:column headerValue="Mailing Address">
+                <apex:outputText value="{!LeadVar.sMailingAddress}"  escape="false"/>
+            </apex:column>
+            <apex:column value="{!LeadVar.oLead.Email}" headerValue="Preferred Email"/>
+            <apex:column value="{!LeadVar.oLead.Phone}" headerValue="Preferred Phone"/>
+            <apex:column headerValue="Owner" id="OwnerCol">
+              <a href="{!LeadVar.sOwnerURL}" target="_blank">{!LeadVar.oLead.Owner.Name}</a>
+            </apex:column>
+                 
+       
+       
+       </apex:pageBlockTable>
+      
+       
+       
+      <br/><br/>
+       </apex:pageBlock>
+    <apex:actionStatus id="blockUI" stopText="">
+            <apex:facet name="start">
+                <div>
+                    <div class="popupBackground" />
+                    <div class="PopupPanel">
+                        <table border="0" width="100%" height="100%">
+                            <tr>
+                                <td align="center"><b>Please Wait</b></td>
+                            </tr>
+                            <tr>
+                                <td align="center"><img src="/img/loading32.gif"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </apex:facet>
+        </apex:actionStatus> 
+ 
+ </apex:form>
+</apex:page>
